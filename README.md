@@ -1,8 +1,47 @@
 # Project: Camp CONNECT Portal
 
+## Development
+
+### System Requirements
+* Linux, MacOS, or Windows
+* Python 3.3 or greater
+
+### Step 1: Clone and Change Directory
+
+```
+git clone https://github.com/shaniljasani/CONNECTPortal.git
+```
+
+```
+cd CONNECTPortal
+```
+
+### Step 2: Setting up a Python Virtual Environment in Directory
+
+Run the following command to create a python virtual environment.
+```
+python3 -m venv venv
+```
+This will create a folder called `venv` in the current directory which should be the root of this project's directory. `venv` stores all the virtual environment binary files.
+
+### Step 3: Running the Virtual Environment
+
+The following command will start up the virtual environment
+```
+source venv/bin/activate
+```
+
+### Step 4: Download dependencies
+```
+pip install -r requirements.txt
+```
+
+### Step 5: Start the Server
+```
+python app.py
+```
 
 ## Context/Current situation
-
 
 CONNECT, a virtual camp that was brought directly to the homes of 1,075 participants during a 10-day period this July, was an effort to bring the global youth together through creativity and exploration. 
 
@@ -13,6 +52,7 @@ In the run-up to the July camp, the technology team built a portal to service th
 The Camp CONNECT Portal is a central resource for participants, facilitators, and staff to access resources, support, and personalized schedules. 
 
 ## Scope:
+
 In July, the portal allowed participants and facilitators to use their camp ID to login to the portal and access the above information. 
 
 
@@ -23,17 +63,19 @@ For the December camp, we are looking to integrate their personalised schedule d
 
 
 This will also be extended to staff members.
+
 ## Milestones:
 * Single Sign-On using Camp ID and Password
 * Custom Participant & Facilitator Schedule Page
    * (data exists in Google Sheets & Airtable)
+
 ## Preferred skillsets:
 * HTML/CSS/Bootstrap
 * Python with Flask, or similar Web Development Framework
 * SQL 
+
 ## Time Duration:
 Assuming a team of three (with varying levels of experience), we estimate this to take a maximum of 15 hours
-
 
 ## Deadline:
 5th December 2020
