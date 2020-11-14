@@ -17,6 +17,10 @@ def hello():
 def login():
     return render_template("login.html")
 
+@app.route('/logout')
+def logout():
+    return render_template("login.html")
+
 @app.route('/resources')
 def resources():
     return render_template("resources.html")
