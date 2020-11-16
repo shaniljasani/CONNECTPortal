@@ -66,14 +66,6 @@ def logout():
     session.pop("user", None)
     return(redirect(url_for("login")))
 
-@app.route('/resources')
-def resources():
-    return render_template("resources.html")
-
-@app.route('/forgot-password')
-def forgotPassword():
-    return render_template("forgot-password.html")
-
 @app.route('/schedules', methods=['GET', 'POST'])
 def schedules():
     if request.method == 'POST':
