@@ -15,8 +15,10 @@ git clone https://github.com/shaniljasani/CONNECTPortal.git
 ```
 cd CONNECTPortal
 ```
+### Step 2: Add a `config.py` File
+Use the `config_EXAMPLE.py` file template to create a `config.py` file. Add your `AIRTABLE_API_KEY` to the file. *This is an important step to ensure data is properly collected from AirTable*
 
-### Step 2: Setting up a Python Virtual Environment in Directory
+### Step 3: Set up a Python Virtual Environment in Directory
 
 Run the following command to create a python virtual environment.
 ```
@@ -24,19 +26,19 @@ python3 -m venv venv
 ```
 This will create a folder called `venv` in the current directory which should be the root of this project's directory. `venv` stores all the virtual environment binary files.
 
-### Step 3: Running the Virtual Environment
+### Step 4: Run the Virtual Environment
 
 The following command will start up the virtual environment
 ```
 source venv/bin/activate
 ```
 
-### Step 4: Download dependencies
+### Step 5: Download Dependencies
 ```
 pip install -r requirements.txt
 ```
 
-### Step 5: Start the Server
+### Step 6: Start the Server
 ```
 python app.py
 ```

@@ -72,3 +72,6 @@ $RECYCLE.BIN/
 
 # Editor Files
 .vscode
+
+# Secrets
+config.py
