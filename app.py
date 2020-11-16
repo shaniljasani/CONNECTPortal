@@ -45,13 +45,8 @@ def login():
     if request.method == 'POST':
         user = request.form.get("id")
         pw = request.form.get("pw")
-        
-        print(user)
-        print(pw)
 
         uid = verify(user, pw)
-
-        print(uid)
 
         if uid:
             session["user"] = uid
