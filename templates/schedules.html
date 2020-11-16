@@ -16,10 +16,7 @@
   <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link href="css/sb-admin-2.min.css" rel="stylesheet">
-
-  <!-- Custom styles for this page -->
-  <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <link href="static/css/portal.min.css" rel="stylesheet">
 
 </head>
 
@@ -138,12 +135,12 @@
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">AAA-USER's Schedule for AAA-DAY</h6>
+              <h6 class="m-0 font-weight-bold text-primary">Schedule for Day #1</h6>
             </div>
             <div class="card-body">
               <div class="table-responsive">
                 <div class="print-area">
-                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <table class="table table-bordered" id="schTable" width="100%" cellspacing="0">
                     <thead>
                       <tr>
                           <th>Time</th>
@@ -151,63 +148,6 @@
                           <th>Link</th>
                       </tr>
                   </thead>
-                  <tbody>
-                      <tr>
-                          <td> "01:30 AM <br/> 02:15 AM" </td>
-                          <td> "Check-In & Cabin Group Opening Activity" </td>                        
-                          <td><a href=  "$family_link" > $family_link </a></td>                        
-                      </tr>
-                      
-                      <tr>
-                          <td> "02:20 AM <br/> 02:40 AM" </td>
-                          <td> "EXPLORE Faculty Session with Family" </td>
-                          <td><a href="link.campconnect.co/zoomB">link.campconnect.co/zoomB</a></td>
-                      </tr>
-                      
-                      <tr>
-                          <td> "02:45 AM <br/> 04:00 AM" </td>
-                          <td> "EXPLORE Group Session" </td>
-                          <td><a href="link.campconnect.co/zoomC">link.campconnect.co/zoomC</a></td>
-                      </tr>
-                      
-                      <tr>
-                          <td> "04:00 AM <br/> 04:25 AM" </td>
-                          <td>BREAK TIME</td>
-                          <td>NO LINK <br/> Please spend some time off-screen <br/> to rest your eyes and stretch your body</a></td>
-                      </tr>
-                      
-                      <tr>
-                          <td> "04:30 AM <br/> 04:40 AM" </td>
-                          <td> "CREATE Activity " </td>
-                          <td><a href="link.campconnect.co/zoomB">link.campconnect.co/zoomB</a></td>
-                      </tr>
-                      
-                      <tr>
-                          <td> "04:40 AM <br/> 06:00 AM" </td>
-                          <td> "CREATE Workshop" </td>
-                          <td><a href="link.campconnect.co/zoomD">link.campconnect.co/zoomD</a></td>
-                      </tr>
-                      
-                      <tr>
-                          <td> "06:00 AM <br/> 06:25 AM" </td>
-                          <td>BREAK TIME</td>
-                          <td>NO LINK <br/> Please spend some time off-screen <br/> to rest your eyes and stretch your body</a></td>
-                      </tr>
-                      
-                      <tr>
-                          <td> "06:30 AM <br/> 07:35 AM" </td>
-                          <td> "GATHER Community" </td>
-                          <td><a href="link.campconnect.co/zoomB">link.campconnect.co/zoomB</a></td>
-                      </tr>
-                      
-                      <tr>
-                          <td> "07:35 AM <br/> 08:00 AM" </td>
-                          <td> "Cabin Group Closing Session" </td>
-                          <td><a href="link.campconnect.co/zoomA">link.campconnect.co/zoomA</a></td>
-                      </tr>
-      
-                  </tbody>
-  
                   </table>
                 </div>
               </div>
@@ -756,21 +696,48 @@
   </div>
 
   <!-- Bootstrap core JavaScript-->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="static/vendor/jquery/jquery.min.js"></script>
+  <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Core plugin JavaScript-->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+  <script src="static/vendor/jquery-easing/jquery.easing.min.js"></script>
 
   <!-- Custom scripts for all pages-->
-  <script src="js/sb-admin-2.min.js"></script>
+  <script src="static/js/portal.min.js"></script>
 
   <!-- Page level plugins -->
-  <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-  <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script src="static/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-  <!-- Page level custom scripts -->
-  <script src="js/demo/datatables-demo.js"></script>
+  <script>
+    var schTable;
+
+    $(document).ready( function () {
+        schTable = $('#schTable')
+        .on( 'page.dt',   function () 
+        { 
+          var info = schTable.page.info();
+          console.log( 'Showing page: '+info.page+' of '+info.pages );
+        })
+        .DataTable(
+        {
+          "bSort" : false,
+          "bInfo" : false,
+          "bFilter": false,
+          "lengthChange": false,
+          lengthMenu: {{ numActivities }}
+        });
+        MakeSchTable();
+    } );
+
+    function MakeSchTable()
+    {
+      var schData = {{ data|tojson|safe }};
+      schTable.clear();
+      schTable.rows.add(schData);
+      schTable.draw();
+    }
+  </script>
 
 </body>
 
