@@ -59,6 +59,10 @@ def login():
 
         return render_template("login.html")
     
+    user_id = session.get("user", None)
+    if user_id:
+        return redirect(url_for("index"))
+    
     return render_template("login.html")
 
 @app.route('/logout')
