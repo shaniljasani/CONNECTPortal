@@ -31,14 +31,6 @@ def login():
 def logout():
     return render_template("login.html")
 
-@app.route('/resources')
-def resources():
-    return render_template("resources.html")
-
-@app.route('/forgot-password')
-def forgotPassword():
-    return render_template("forgot-password.html")
-
 @app.route('/schedules', methods=['GET', 'POST'])
 def schedules():
     if request.method == 'POST':
