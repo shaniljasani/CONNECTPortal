@@ -35,6 +35,10 @@ def logout():
 def resources():
     return render_template("resources.html")
 
+@app.route('/schedules')
+def schedules():
+    return render_template("schedules.html")
+
 @app.route('/forgot-password')
 def forgotPassword():
     return render_template("forgot-password.html")
