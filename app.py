@@ -4,32 +4,67 @@ import urllib.parse
 import json
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, send_from_directory, url_for, request, redirect
+from flask import Flask, render_template, send_from_directory, url_for, request, redirect, session
 from airtable import Airtable
 from datetime import datetime, timedelta
 
-# set the "static" directory as the static folder
-app = Flask(__name__, static_url_path='/static')
-
 load_dotenv(dotenv_path="./config.py")
 
+# set the "static" directory as the static folder
+app = Flask(__name__, static_url_path='/static')
+app.secret_key = os.getenv("APP_SECRET")
+
 API_KEY = os.getenv("AIRTABLE_API_KEY")
+BASE_ID = "appqzHMiklMrdGU3D"
+
+def verify(user, pw):
+    airtable = Airtable(BASE_ID, 'Authentication', API_KEY)
+    user_data = airtable.search("ID (from ID)", user)
+
+    if user_data:
+        user_password = user_data[0]["fields"]["Password"]
+        if user_password == pw:
+            return user_data[0]["fields"]["ID (from ID)"][0]
+    
+    return False
 
 @app.route('/<path:path>')
 def send_static(path):
     return send_from_directory('static', path)
 
 @app.route('/')
-def hello():
-    return render_template("index.html")
+def index():
+    user_id = session.get("user", None)
+    if user_id:
+        return render_template("index.html")
+    
+    return redirect(url_for("login"))
 
-@app.route('/login')
+@app.route('/login', methods = ["GET", "POST"])
 def login():
+    if request.method == 'POST':
+        user = request.form.get("id")
+        pw = request.form.get("pw")
+        
+        print(user)
+        print(pw)
+
+        uid = verify(user, pw)
+
+        print(uid)
+
+        if uid:
+            session["user"] = uid
+            return redirect(url_for("index"))
+
+        return render_template("login.html")
+    
     return render_template("login.html")
 
 @app.route('/logout')
 def logout():
-    return render_template("login.html")
+    session.pop("user", None)
+    return(redirect(url_for("login")))
 
 @app.route('/resources')
 def resources():
