@@ -135,32 +135,36 @@ def schedules():
             day = schInfo[len(schArr)]['fields']['Day']
             durTracker = startdate + timedelta(days=(day-1), hours=timezoneOffset)
 
-        schData[0] = durTracker
+        schData[1] = durTracker
         durTracker = durTracker + timedelta(minutes=duration)
-        schData[0] = datetime.strftime(schData[0], "%m-%-d %H:%M") + ' - ' + datetime.strftime(durTracker, "%H:%M") + ' ' + timezone
+        schData[0] = datetime.strftime(schData[1], "%m-%-d")
+        schData[1] = datetime.strftime(schData[1], "%H:%M") + ' - ' + datetime.strftime(durTracker, "%H:%M") + ' ' + timezone
 
         #Activity
-        schData[1] = schInfo[len(schArr)]['fields']['ActivityType']
+        schData[2] = schInfo[len(schArr)]['fields']['ActivityType']
 
         #Zoom Link
-        if schData[1]=='Cabin':
-            schData[2] = cabinLink
-        elif schData[1]== 'Transition':
-            schData[2] = 'Transition'
-        elif schData[1]=='Gather':
-            schData[2] = familyLink
-        elif schData[1]=='Break':
-            schData[2] = 'Break'
-        elif schData[1]== 'Create':
-            schData[2] = createLink
-        elif schData[1]== 'Explore':
-            schData[2] = familyLink
+        if schData[2]=='Cabin':
+            schData[3] = cabinLink
+        elif schData[2]== 'Transition':
+            schData[3] = 'Transition'
+        elif schData[2]=='Gather':
+            schData[3] = familyLink
+        elif schData[2]=='Break':
+            schData[3] = 'Break'
+        elif schData[2]== 'Create':
+            schData[3] = createLink
+        elif schData[2]== 'Explore':
+            schData[3] = familyLink
         else:
-            schData[2]=schData[1]
+            schData[3]=schData[2]
         
         schArr.append(schData)
 
-    return render_template('schedules.html', data=schArr, numActivities = 11-int(stagger))
+    #get camp day #, default to 1
+    campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
+
+    return render_template('schedules.html', data=schArr, campday=campday)
 
 @app.errorhandler(401)
 def FUN_401(error):

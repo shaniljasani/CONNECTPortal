@@ -5,10 +5,8 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
   <h1 class="h3 mb-2 text-gray-800">My Schedule</h1>
-  <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-      class="fas fa-download fa-sm text-white-50"></i> Download PDF</a>
-  <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-      class="fas fa-download fa-sm text-white-50"></i> Download PDF</a>
+  <button id="btnPDF" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+      class="fas fa-download fa-sm text-white-50"></i> Download PDF</button>
 </div>
 
 
@@ -17,7 +15,21 @@
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
   <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-primary">Schedule for Day #1</h6>
+    <div class="row">
+      <div class="col-9">
+        <h6 class="m-0 font-weight-bold text-primary">Schedule for Day #<label id="lblCampday"></label></h6>
+      </div>
+      <div class="col-3">
+        <select id="ddDay" class="form-control">
+          <option value="1">Day 1</option>
+          <option value="2">Day 2</option>
+          <option value="3">Day 3</option>
+          <option value="4">Day 4</option>
+          <option value="5">Day 5</option>
+          <option value="6">Day 6</option>
+        </select>
+      </div>
+    </div>
   </div>
   <div class="card-body">
     <div class="table-responsive">
@@ -25,6 +37,7 @@
         <table class="table table-bordered" id="schTable" width="100%" cellspacing="0">
           <thead>
             <tr>
+              <th>Day</th>
               <th>Time</th>
               <th>Activity</th>
               <th>Link</th>
@@ -541,18 +554,40 @@
   var schTable;
 
   $(document).ready(function () {
+    var campday = {{campday}};
     schTable = $('#schTable')
-      .on('page.dt', function () {
-        var info = schTable.page.info();
-        console.log('Showing page: ' + info.page + ' of ' + info.pages);
-      })
-      .DataTable({
-        "bSort": false,
-        "bInfo": false,
-        "bFilter": false,
-        "lengthChange": false,
-        lengthMenu: {{numActivities}}
-      });
+                .DataTable({
+                  dom: 'lrtip',
+                  buttons: 
+                  [{ 
+                      extend: 'pdf', 
+                      name: 'pdf',
+                      customize: function(doc) 
+                      {
+                        doc.styles.title = {
+                          fontSize: '40',
+                          alignment: 'center'
+                        }
+                        doc.styles.tableHeader = {
+                          alignment: 'right'
+                        }
+                        doc.styles.tableBodyEven = {
+                          alignment: 'right'
+                        }
+                        doc.styles.tableBodyOdd = {
+                          alignment: 'right'
+                        }
+                        doc.styles.tableFooter = {
+                          alignment: 'right'
+                        }
+                      }   
+                  }], 
+                  "bSort": false,
+                  "bInfo": false,
+                  "paging": false
+                });
+    $('#lblCampday').text(campday)
+    $("#ddDay").val(campday).change();
     MakeSchTable();
   });
 
@@ -562,5 +597,28 @@
     schTable.rows.add(schData);
     schTable.draw();
   }
+
+  //triggers hidden pdf button on datatable dom
+  $('#btnPDF').on('click',function (){
+    schTable.button('pdf:name').trigger();
+  })
+
+  $('#ddDay').on('change', function() {
+    $.fn.dataTableExt.afnFiltering.length = 0;
+    schTable.draw();
+    let val = parseInt(this.value)
+    $('#lblCampday').text(val)
+    console.log('12-' + (25+val))
+    $.fn.dataTable.ext.search.push(
+    function( settings, data, dataIndex ) {
+        if ( data[0] == '12-' + (25+val))
+        {
+            return true;
+        }
+        return false;
+    })
+    schTable.draw();
+  });
+
 </script>
 {% endblock %}

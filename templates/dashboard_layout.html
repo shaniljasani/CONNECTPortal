@@ -20,6 +20,9 @@
   <!-- Custom styles for this template-->
   <link href="static/css/portal.min.css" rel="stylesheet">
 
+  <!-- DataTables.net button requirements-->
+  <link href="static/vendor/datatables/dataTables.buttons.min.css" rel="stylesheet">
+
 </head>
 
 <body id="page-top">
@@ -182,6 +185,14 @@
   <!-- Page level plugins -->
   <script src="static/vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+  <!-- DataTables.net button requirements, including pdf make -->
+  <script src="static/vendor/pdfmake/pdfmake.min.js"></script>
+  <script src="static/vendor/pdfmake/vfs_fonts.js"></script>
+  <script src="static/vendor/datatables/dataTables.buttons.min.js"></script>
+  <script src="static/vendor/datatables/buttons.bootstrap4.min.js"></script>
+  <script src="static/vendor/datatables/buttons.flash.min.js"></script>
+  <script src="static/vendor/datatables/buttons.html5.min.js"></script>
 
   {%block script%}{% endblock %}
 </body>
