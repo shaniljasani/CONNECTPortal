@@ -144,17 +144,17 @@ def schedules():
         schData[2] = schInfo[len(schArr)]['fields']['ActivityType']
 
         #Zoom Link
-        if schData[2]=='Cabin':
+        if 'Cabin' in schData[2]:
             schData[3] = cabinLink
-        elif schData[2]== 'Transition':
+        elif 'Transition' in schData[2]:
             schData[3] = 'Transition'
-        elif schData[2]=='Gather':
+        elif 'Gather' in schData[2]:
             schData[3] = familyLink
-        elif schData[2]=='Break':
+        elif 'Break' in schData[2]:
             schData[3] = 'Break'
-        elif schData[2]== 'Create':
+        elif 'Create' in schData[2]:
             schData[3] = createLink
-        elif schData[2]== 'Explore':
+        elif 'Explore' in schData[2]:
             schData[3] = familyLink
         else:
             schData[3]=schData[2]
