@@ -620,7 +620,7 @@
     $('#lblCampday').text(val)
     $.fn.dataTable.ext.search.push(
     function( settings, data, dataIndex ) {
-        if ( data[0] == '12-' + (25+val))
+        if (data[0].indexOf(25+val) > 0)
         {
             return true;
         }

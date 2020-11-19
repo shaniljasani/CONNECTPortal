@@ -137,7 +137,7 @@ def schedules():
 
         schData[1] = durTracker
         durTracker = durTracker + timedelta(minutes=duration)
-        schData[0] = datetime.strftime(schData[1], "%m-%-d")
+        schData[0] = datetime.strftime(schData[1], "%b %-d")
         schData[1] = datetime.strftime(schData[1], "%H:%M") + ' - ' + datetime.strftime(durTracker, "%H:%M") + ' ' + timezone
 
         #Activity
