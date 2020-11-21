@@ -43,6 +43,11 @@ pip install -r requirements.txt
 python app.py
 ```
 
+## Scripts
+The `/scripts` folder provides Python scripts that may be useful to perform Airtable data population in situations where data from other tables is manipulated and needs to be synced across the Airtable data tables.
+
+* `populate_auth_table.py`: takes data from Facilitators and Participants tables and creates authentication for users that don't already have one
+
 ## Context/Current situation
 
 CONNECT, a virtual camp that was brought directly to the homes of 1,075 participants during a 10-day period this July, was an effort to bring the global youth together through creativity and exploration. 
