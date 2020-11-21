@@ -15,7 +15,7 @@ app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv("APP_SECRET")
 
 API_KEY = os.getenv("AIRTABLE_API_KEY")
-BASE_ID = "appqzHMiklMrdGU3D"
+BASE_ID = os.getenv("BASE_ID")
 
 def verify(user, pw):
     airtable = Airtable(BASE_ID, 'Authentication', API_KEY)
