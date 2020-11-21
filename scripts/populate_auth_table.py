@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 from airtable import Airtable
 
-load_dotenv(dotenv_path="../config.py")
+directory = os.path.abspath(os.path.dirname(__file__))
+CONFIG_PATH = os.path.join(directory, "../config.py")
+load_dotenv(dotenv_path=CONFIG_PATH)
 
 API_KEY = os.getenv("AIRTABLE_API_KEY")
 BASE_ID = os.getenv("BASE_ID")
