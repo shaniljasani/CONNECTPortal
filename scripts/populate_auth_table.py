@@ -12,7 +12,7 @@ auth_table = Airtable(BASE_ID, "Authentication", API_KEY)
 participant_table = Airtable(BASE_ID, "Participant", API_KEY)
 facilitator_table = Airtable(BASE_ID, "Facilitator", API_KEY)
 
-participants = dict()
+users = dict()
 
 # GET DATA FROM PARTICIPANTS TABLE
 print("Getting ids from participant table...")
@@ -24,9 +24,9 @@ for participant in participants_data:
   if fields:
     id = fields["ID"]
     if id:
-      participants[id] = participant["id"]
+      users[id] = participant["id"]
 
-records_count = len(participants)
+records_count = len(users)
 print(str(records_count) + " records taken from participant table.")
 
 print("Getting records from auth table...")
@@ -40,7 +40,7 @@ for participant in authentication_data:
   if fields:
     id = fields["ID"]
     if id:
-      participants[id] = None
+      users[id] = None
       records_count += 1
 
 print(str(records_count) + " of the records already exist in authentication table.")
@@ -52,7 +52,7 @@ new_records = 0
 
 # AGREGATE DATA FOR INSERTION 
 # Create batch records
-for participant_id, reference_id in participants.items():
+for participant_id, reference_id in users.items():
   # If 10 records have already been added to a batch
   if record_iteration == 10:
     record_iteration = 0
