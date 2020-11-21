@@ -19,12 +19,12 @@ BASE_ID = os.getenv("BASE_ID")
 
 def verify(user, pw):
     airtable = Airtable(BASE_ID, 'Authentication', API_KEY)
-    user_data = airtable.search("ID (from ID)", user)
+    user_data = airtable.search("ID", user)
 
     if user_data:
         user_password = user_data[0]["fields"]["Password"]
         if user_password == pw:
-            return user_data[0]["fields"]["ID (from ID)"][0]
+            return user_data[0]["fields"]["ID"]
     
     return False
 
