@@ -1,0 +1,38 @@
+{% extends "dashboard_layout.html" %}
+{% block page_title %} Get Support {% endblock %}
+{% block body %}
+    {{ super() }}
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Camp CONNECT Support</h1>
+    <p class="mb-4">Contact the Support Helpdesk at any time using the platforms below.</p>
+
+
+
+    <!-- Support Webform -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Support Form</h6>
+        <br/>
+        <p>To get help on any issues you have, please complete the form below.</p>
+        <p>Provide as much detail as you can. We would like to know:</p>
+        <ol>
+        <li>Device Type</li>
+        <li>What application or program you are having issues with</li>
+        <li>What aspect of the application is causing the issue (ie &#8220;I cannot hear anything in the Zoom&#8221;)</li>
+        <li>Screenshots are great, if you are able to send one with your ticket</li>
+        <li>If you are submitting a ticket on the behalf of someone else, please provide the contact information for the person experiencing issues</li>
+        </ol>
+        <p class="font-weight-bold">If you do not know your Camp ID, please enter 0000 and mention this in the description</p>
+        <p></p>
+        <p>After submitting a ticket you will receive a response email from the helpdesk. If you want to update your ticket with any additional information, please respond to the email from the support team.</p>
+        <br/>
+    
+    
+
+            <!-- DUMMY FORM  -->
+            <!-- TODO add updated form from Nadim  -->
+            <iframe title="Feedback Form" class="freshwidget-embedded-form" id="freshwidget-embedded-form" src="https://campconnect.freshdesk.com/widgets/feedback_widget/new?&widgetType=embedded&formTitle=Help+%26+Support&submitTitle=Submit&submitThanks=Thank+you+for+your+submission.+Someone+should+be+reaching+out+to+you+soon.+&screenshot=No&searchArea=no" scrolling="no" height="759px" width="100%" frameborder="0" ></iframe>
+        </div>
+    </div>
+{% endblock %}
