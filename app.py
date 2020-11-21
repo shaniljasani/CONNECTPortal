@@ -65,6 +65,10 @@ def logout():
     session.pop("user", None)
     return(redirect(url_for("login")))
 
+#function to create html anchors
+def htmlanchor(link):
+    return "<a href='" + link + "' target='_blank'>" + link + "</a>"
+
 @app.route('/schedules', methods=['GET', 'POST'])
 def schedules():
     if request.method == 'POST':
@@ -145,17 +149,17 @@ def schedules():
 
         #Zoom Link
         if 'Cabin' in schData[2]:
-            schData[3] = cabinLink
+            schData[3] = htmlanchor(cabinLink)
         elif 'Transition' in schData[2]:
             schData[3] = 'Transition'
         elif 'Gather' in schData[2]:
-            schData[3] = familyLink
+            schData[3] = htmlanchor(familyLink)
         elif 'Break' in schData[2]:
             schData[3] = 'Break'
         elif 'Create' in schData[2]:
-            schData[3] = createLink
+            schData[3] = htmlanchor(createLink)
         elif 'Explore' in schData[2]:
-            schData[3] = familyLink
+            schData[3] = htmlanchor(familyLink)
         else:
             schData[3]=schData[2]
         
