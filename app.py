@@ -19,12 +19,12 @@ BASE_ID = os.getenv("BASE_ID")
 
 def verify(user, pw):
     airtable = Airtable(BASE_ID, 'Authentication', API_KEY)
-    user_data = airtable.search("ID (from ID)", user)
+    user_data = airtable.search("ID", user)
 
     if user_data:
         user_password = user_data[0]["fields"]["Password"]
         if user_password == pw:
-            return user_data[0]["fields"]["ID (from ID)"][0]
+            return user_data[0]["fields"]["ID"]
     
     return False
 
@@ -68,6 +68,10 @@ def login():
 def logout():
     session.pop("user", None)
     return(redirect(url_for("login")))
+
+#function to create html anchors
+def htmlanchor(link):
+    return "<a href='" + link + "' target='_blank'>" + link + "</a>"
 
 @app.route('/schedules', methods=['GET', 'POST'])
 def schedules():
@@ -149,17 +153,17 @@ def schedules():
 
         #Zoom Link
         if 'Cabin' in schData[2]:
-            schData[3] = cabinLink
+            schData[3] = htmlanchor(cabinLink)
         elif 'Transition' in schData[2]:
             schData[3] = 'Transition'
         elif 'Gather' in schData[2]:
-            schData[3] = familyLink
+            schData[3] = htmlanchor(familyLink)
         elif 'Break' in schData[2]:
             schData[3] = 'Break'
         elif 'Create' in schData[2]:
-            schData[3] = createLink
+            schData[3] = htmlanchor(createLink)
         elif 'Explore' in schData[2]:
-            schData[3] = familyLink
+            schData[3] = htmlanchor(familyLink)
         else:
             schData[3]=schData[2]
         
