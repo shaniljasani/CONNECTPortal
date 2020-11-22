@@ -40,6 +40,10 @@ def index():
     
     return redirect(url_for("login"))
 
+@app.route('/support')
+def support():
+    return render_template("support.html")
+
 @app.route('/login', methods = ["GET", "POST"])
 def login():
     if request.method == 'POST':
