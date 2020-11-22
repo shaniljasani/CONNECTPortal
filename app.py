@@ -48,7 +48,11 @@ def support():
 def resources():
     user_id = session.get("user", None)
     if user_id:
-        return render_template("resources.html")
+
+        resources = Airtable(BASE_ID, 'Resources', API_KEY).get_iter(sort=['Order'])
+
+        return render_template("resources.html", resources=resources)
+
     return render_template("login.html")
 
 @app.route('/login', methods = ["GET", "POST"])
