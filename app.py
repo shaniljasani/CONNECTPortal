@@ -75,104 +75,103 @@ def htmlanchor(link):
 
 @app.route('/schedules', methods=['GET', 'POST'])
 def schedules():
-    if request.method == 'POST':
-        # do stuff when the form is submitted
-
-        # redirect to end the POST handling
-        # the redirect can be to the same route or somewhere else
-        return redirect(url_for('index'))
-
-    BASE_ID = "appqzHMiklMrdGU3D"
-    ppantID = 1900
-    
-    #get data of ppant
-    stagger=0
-    timezoneID=''
-    familyID=''
-    cabinID=''
-    createID=''
-    for page in Airtable(BASE_ID, 'Participant', API_KEY).get_iter(formula=f"{{ID}}={ppantID}"):
-        for record in page:
-            stagger = record['fields']['Stagger'][0]
-            timezoneID = record['fields']['TimeZone'][0]
-            familyID = record['fields']['Family'][0]
-            cabinID = record['fields']['Cabin'][0]
-            createID = record['fields']['Create Room'][0]
-
-
-    #get timezone info
-    timezoneInfo = Airtable(BASE_ID,'TimeZone', API_KEY).get(timezoneID)
-    timezone = timezoneInfo['fields']['TimeZone']
-    timezoneOffset = timezoneInfo['fields']['GMT Offset']
-    # print(timezone)
-    # print(timezoneOffset)
-
-    #get family link
-    familyLink = Airtable(BASE_ID,'Family', API_KEY).get(familyID)['fields']['Zoom Link']
-    # print(familyLink)
-
-    #get cabin link
-    cabinLink = Airtable(BASE_ID,'Cabin', API_KEY).get(cabinID)['fields']['Zoom Link']
-    # print(cabinLink)
-
-    #get create link
-    createLink = Airtable(BASE_ID,'Create', API_KEY).get(createID)['fields']['Zoom Link']
-    # print(createLink)
-      
-    #get sch data using ppant stagger
-    schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f"{{Stagger}}={stagger}",sort=['Day', '-Order']) # -order because they're put in backwards in the for loop
-
-    #list that will store organize the schData objects for the table
-    schArr = []
-
-    #camp start date for stagger and duration tracker
-    startdate = datetime(year=2020, month=12, day=26, hour=10, minute=30)
-    durTracker = datetime(year=2020, month=12, day=26, hour=0, minute=0)
-    if stagger==2:
-        startdate = datetime(year=2020, month=12, day=26, hour=13, minute=30)
-
-    #day tracker 
-    day = 0
-    for record in schInfo:
-        schData = {}
-
-        #DateTime Ranges
-        duration = schInfo[len(schArr)]['fields']['Duration']
-
-        if(day != schInfo[len(schArr)]['fields']['Day']):
-            day = schInfo[len(schArr)]['fields']['Day']
-            durTracker = startdate + timedelta(days=(day-1), hours=timezoneOffset)
-
-        schData[1] = durTracker
-        durTracker = durTracker + timedelta(minutes=duration)
-        schData[0] = datetime.strftime(schData[1], "%b %-d")
-        schData[1] = datetime.strftime(schData[1], "%H:%M") + ' - ' + datetime.strftime(durTracker, "%H:%M") + ' ' + timezone
-
-        #Activity
-        schData[2] = schInfo[len(schArr)]['fields']['ActivityType']
-
-        #Zoom Link
-        if 'Cabin' in schData[2]:
-            schData[3] = htmlanchor(cabinLink)
-        elif 'Transition' in schData[2]:
-            schData[3] = 'Transition'
-        elif 'Gather' in schData[2]:
-            schData[3] = htmlanchor(familyLink)
-        elif 'Break' in schData[2]:
-            schData[3] = 'Break'
-        elif 'Create' in schData[2]:
-            schData[3] = htmlanchor(createLink)
-        elif 'Explore' in schData[2]:
-            schData[3] = htmlanchor(familyLink)
-        else:
-            schData[3]=schData[2]
+    user_id = session.get("user", None)
+    if user_id:
         
-        schArr.append(schData)
+        user_tbl = 'Participant'
+        #check if user is fac or ppant
+        check = Airtable(BASE_ID, 'Participant', API_KEY).search('ID',user_id)
 
-    #get camp day #, default to 1
-    campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
+        if(not check):
+            user_tbl = 'Facilitator'
 
-    return render_template('schedules.html', data=schArr, campday=campday)
+        stagger=0
+        timezoneID=''
+        familyID=''
+        cabinID=''
+        createID=''
+        for page in Airtable(BASE_ID, user_tbl, API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
+            for record in page:
+                stagger = record['fields']['Stagger'][0]
+                timezoneID = record['fields']['TimeZone'][0]
+                familyID = record['fields']['Family'][0]
+                cabinID = record['fields']['Cabin'][0]
+                createID = record['fields']['Create Room'][0]
+
+        #get timezone info
+        timezoneInfo = Airtable(BASE_ID,'TimeZone', API_KEY).get(timezoneID)
+        timezone = timezoneInfo['fields']['TimeZone']
+        timezoneOffset = timezoneInfo['fields']['GMT Offset']
+        # print(timezone)
+        # print(timezoneOffset)
+
+        #get family link
+        familyLink = Airtable(BASE_ID,'Family', API_KEY).get(familyID)['fields']['Zoom Link']
+        # print(familyLink)
+
+        #get cabin link
+        cabinLink = Airtable(BASE_ID,'Cabin', API_KEY).get(cabinID)['fields']['Zoom Link']
+        # print(cabinLink)
+
+        #get create link
+        createLink = Airtable(BASE_ID,'Create', API_KEY).get(createID)['fields']['Zoom Link']
+        # print(createLink)
+        
+        #get sch data using ppant stagger
+        schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f"{{Stagger}}={stagger}",sort=['Day', '-Order']) # -order because they're put in backwards in the for loop
+
+        #list that will store organize the schData objects for the table
+        schArr = []
+
+        #camp start date for stagger and duration tracker
+        startdate = datetime(year=2020, month=12, day=26, hour=10, minute=30)
+        durTracker = datetime(year=2020, month=12, day=26, hour=0, minute=0)
+        if stagger==2:
+            startdate = datetime(year=2020, month=12, day=26, hour=13, minute=30)
+
+        #day tracker 
+        day = 0
+        for record in schInfo:
+            schData = {}
+
+            #DateTime Ranges
+            duration = schInfo[len(schArr)]['fields']['Duration']
+
+            if(day != schInfo[len(schArr)]['fields']['Day']):
+                day = schInfo[len(schArr)]['fields']['Day']
+                durTracker = startdate + timedelta(days=(day-1), hours=timezoneOffset)
+
+            schData[1] = durTracker
+            durTracker = durTracker + timedelta(minutes=duration)
+            schData[0] = datetime.strftime(schData[1], "%b %-d")
+            schData[1] = datetime.strftime(schData[1], "%I:%M %p") + ' - ' + datetime.strftime(durTracker, "%I:%M %p") + ' ' + timezone
+
+            #Activity
+            schData[2] = schInfo[len(schArr)]['fields']['ActivityType']
+
+            #Zoom Link
+            if 'Cabin' in schData[2]:
+                schData[3] = htmlanchor(cabinLink)
+            elif 'Transition' in schData[2]:
+                schData[3] = 'Transition'
+            elif 'Gather' in schData[2]:
+                schData[3] = htmlanchor(familyLink)
+            elif 'Break' in schData[2]:
+                schData[3] = 'Break'
+            elif 'Create' in schData[2]:
+                schData[3] = htmlanchor(createLink)
+            elif 'Explore' in schData[2]:
+                schData[3] = htmlanchor(familyLink)
+            else:
+                schData[3]=schData[2]
+            
+            schArr.append(schData)
+
+        #get camp day #, default to 1
+        campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
+
+        return render_template('schedules.html', data=schArr, campday=campday)
+    return render_template("login.html")
 
 @app.errorhandler(401)
 def FUN_401(error):
