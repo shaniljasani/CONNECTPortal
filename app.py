@@ -44,6 +44,17 @@ def index():
 def support():
     return render_template("support.html")
 
+@app.route('/resources')
+def resources():
+    user_id = session.get("user", None)
+    if user_id:
+
+        resources = Airtable(BASE_ID, 'Resources', API_KEY).get_iter(sort=['Order'])
+
+        return render_template("resources.html", resources=resources)
+
+    return render_template("login.html")
+
 @app.route('/login', methods = ["GET", "POST"])
 def login():
     if request.method == 'POST':
