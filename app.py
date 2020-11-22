@@ -46,6 +46,10 @@ def support():
 
 @app.route('/login', methods = ["GET", "POST"])
 def login():
+    data = {
+        "invalid": False
+    }
+
     if request.method == 'POST':
         user = request.form.get("id")
         pw = request.form.get("pw")
@@ -56,13 +60,14 @@ def login():
             session["user"] = uid
             return redirect(url_for("index"))
 
-        return render_template("login.html")
+        data["invalid"] = True
+        return render_template("login.html", data=data)
     
     user_id = session.get("user", None)
     if user_id:
         return redirect(url_for("index"))
     
-    return render_template("login.html")
+    return render_template("login.html", data=data)
 
 @app.route('/logout')
 def logout():
