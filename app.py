@@ -53,7 +53,7 @@ def resources():
 
         return render_template("resources.html", resources=resources)
 
-    return render_template("login.html")
+    return redirect(url_for("login"))
 
 @app.route('/login', methods = ["GET", "POST"])
 def login():
@@ -182,7 +182,8 @@ def schedules():
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
 
         return render_template('schedules.html', data=schArr, campday=campday)
-    return render_template("login.html")
+    
+    return redirect(url_for("login"))
 
 @app.errorhandler(401)
 def FUN_401(error):
