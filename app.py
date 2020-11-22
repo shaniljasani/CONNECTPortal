@@ -44,6 +44,13 @@ def index():
 def support():
     return render_template("support.html")
 
+@app.route('/resources')
+def resources():
+    user_id = session.get("user", None)
+    if user_id:
+        return render_template("resources.html")
+    return render_template("login.html")
+
 @app.route('/login', methods = ["GET", "POST"])
 def login():
     if request.method == 'POST':
