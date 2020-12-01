@@ -188,6 +188,10 @@ def FUN_405(error):
 def FUN_413(error):
     return render_template("413.html"), 413
 
+@app.errorhandler(500)
+def FUN_500(error):
+    return render_template("500.html"), 500    
+
 if __name__ == "__main__":
     # get_some_data()
     app.run(debug=True, host="localhost")
