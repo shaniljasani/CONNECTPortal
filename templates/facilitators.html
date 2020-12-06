@@ -1,0 +1,59 @@
+{% extends "dashboard_layout.html" %}
+{% block page_title %}Facilitator Resources{% endblock %}
+{% block body %}
+{{ super() }}
+
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+<h1 class="h3 mb-0 text-gray-800">Facilitator Resources</h1>
+</div>
+<div class="row">
+
+    <div class="col-12">
+        <div class="row">
+            {% for page in resources %}
+            {% for record in page %}
+                {% set color = '' %}
+                {% if record['fields']['Type']=='Video' %}
+                    {% set color = 'primary' %}
+                {% elif record['fields']['Type']=='Reading' %}
+                    {% set color = 'info' %}
+                {% elif record['fields']['Type']=='Folder' %}
+                    {% set color = 'success' %}
+                {% elif record['fields']['Type']=='Slides' %}
+                    {% set color = 'warning' %}
+                {% endif %}
+                {% if loop.index%2==0 %}
+                <div class="col-6">
+                    <div class="card mb-4 border-left-{{color}} shadow py-2">
+                        <div class="card-header" style="background-color:inherit">
+                            <h6 class="m-0 font-weight-bold text-{{color}}"><a style="color: inherit" href="{{ record['fields']['Link'] }}" target="_blank">{{ record['fields']['Name'] }}</a></h6>
+                        </div>
+                        <div class="card-body">
+                            {{ record['fields']['Description'] }}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-6">
+                    <div class="card mb-4 border-left-{{color}} shadow py-2">
+                        <div class="card-header" style="background-color:inherit">
+                            <h6 class="m-0 font-weight-bold text-{{color}}"><a style="color: inherit" href="{{ record['fields']['Link'] }}" target="_blank">{{ record['fields']['Name'] }}</a></h6>
+                        </div>
+                        <div class="card-body">
+                            {{ record['fields']['Description'] }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+<!-- /.container-fluid -->
+
+{% block script %}
+{% endblock %}
