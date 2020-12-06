@@ -34,7 +34,7 @@
   </div>
   <div class="card-body">
 
-    <p><strong>This schedule has been customized for you. <br/><i>Please do not share or publish in any way, shape, or form.</i></p></strong>
+    <p><strong>This schedule has been customized for you (#{{session.get("user")}}). <br/><i>Please do not share or publish in any way, shape, or form.</i></p></strong>
 
     <div class="table-responsive">
       <div class="print-area">
@@ -90,7 +90,7 @@
                       extend: 'pdf', 
                       name: 'pdf',
                       filename: function(){return 'Day' + $('#ddDay').val() + 'Schedule';},
-                      title: function(){return 'Camp Connect: Day ' + $('#ddDay').val() + ' Schedule';},
+                      title: function(){return 'CONNECT Schedule for #{{session.get("user")}} (Day ' + $('#ddDay').val() + ')';},
                       customize: function(doc) 
                       {
                         doc.styles.title = {
