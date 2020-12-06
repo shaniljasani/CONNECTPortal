@@ -88,7 +88,7 @@
           <span>Get Support</span></a>
       </li>
 
-      <!-- add if  -->
+      {% if (session.get("user", None) < 1010) %}
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -103,7 +103,7 @@
                 <i class="fas fa-fw fa-file"></i>
                 <span>Facilitator Resources</span></a>
             </li>
-      <!-- end if  -->
+        {% endif %}
 
 
       <!-- Divider -->
