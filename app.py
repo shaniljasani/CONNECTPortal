@@ -44,6 +44,17 @@ def index():
 def support():
     return render_template("support.html")
 
+@app.route('/facilitators')
+def facilitators():
+    user_id = session.get("user", None)
+    if user_id:
+        if user_id < 1010:
+            resources = Airtable(BASE_ID, 'Facilitator Resources', API_KEY).get_iter(sort=['Order'])
+            return render_template("facilitators.html", resources=resources)
+        else:
+            return redirect("/")
+    return redirect("/")
+
 @app.route('/resources')
 def resources():
     user_id = session.get("user", None)
