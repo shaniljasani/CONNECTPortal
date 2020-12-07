@@ -88,7 +88,7 @@
           <span>Get Support</span></a>
       </li>
 
-      {% if (session.get("user", None) < 1010) %}
+      {% if (session.get("user", None) and session.get("user", None) < 1010) %}
             <!-- Divider -->
             <hr class="sidebar-divider">
 
