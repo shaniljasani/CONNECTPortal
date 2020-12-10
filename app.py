@@ -28,6 +28,16 @@ def verify(user, pw):
     
     return False
 
+def log_user_activity(uid, endpoint, timestamp):
+    log = {
+        "uid": uid,
+        "endpoint": endpoint,
+        "timestamp": timestamp
+    }
+
+    log_table = Airtable(BASE_ID, 'Activity Logs', API_KEY)
+    log_table.insert(log)
+
 @app.route('/<path:path>')
 def send_static(path):
     return send_from_directory('static', path)
@@ -36,6 +46,8 @@ def send_static(path):
 def index():
     user_id = session.get("user", None)
     if user_id:
+        timestamp = datetime.now()
+        log_user_activity(user_id, "/", str(timestamp))
         return render_template("index.html")
     
     return redirect(url_for("login"))
@@ -204,5 +216,4 @@ def FUN_500(error):
     return render_template("500.html"), 500    
 
 if __name__ == "__main__":
-    # get_some_data()
     app.run(debug=True, host="localhost")
