@@ -119,11 +119,9 @@ def schedules():
 
         #camp start date for stagger and duration tracker
         startdate = datetime(year=2020, month=12, day=26, hour=10, minute=30)
-        orientationdate = datetime(year=2020, month=12, day=19, hour=10, minute=30)
         durTracker = datetime(year=2020, month=12, day=26, hour=0, minute=0)
         if user_data["stagger"]==2:
             startdate = datetime(year=2020, month=12, day=26, hour=13, minute=30)
-            orientationdate = datetime(year=2020, month=12, day=19, hour=13, minute=30)
 
         #day tracker 
         day = 0
