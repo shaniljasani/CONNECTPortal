@@ -29,7 +29,7 @@
   <div class="card-header py-3">
     <div class="row">
       <div class="col-6">
-        <h6 class="m-0 font-weight-bold text-primary">Schedule for<br/>Day #<label id="lblCampday"></label></h6>
+        <h6 class="m-0 font-weight-bold text-primary">Schedule for Day #<label id="lblCampday"></label></h6>
       </div>
       <div class="col-6">
         <select id="ddDay" class="form-control">
@@ -151,9 +151,8 @@
   $('#ddDay').on('change', function() {
     $.fn.dataTableExt.afnFiltering.length = 0;
     schTable.draw();
-    let val = parseInt(this.value)
-    let valdis = parseInt(this.value) - 1
-    $('#lblCampday').text(valdis)
+    let val = parseInt(this.value) - 1
+    $('#lblCampday').text(val)
     $.fn.dataTable.ext.search.push(
     function( settings, data, dataIndex ) {
         if (data[0].indexOf(25+val) > 0)
