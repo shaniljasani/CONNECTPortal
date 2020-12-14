@@ -16,6 +16,11 @@ app.secret_key = os.getenv("APP_SECRET")
 
 API_KEY = os.getenv("AIRTABLE_API_KEY")
 BASE_ID = os.getenv("BASE_ID")
+G_ANALYTICS = os.getenv("G_ANALYTICS")
+
+@app.context_processor
+def inject_analytics():
+    return dict(analytics_id=G_ANALYTICS)
 
 def verify(user, pw):
     airtable = Airtable(BASE_ID, 'Authentication', API_KEY)
