@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+
+<url>
+  <loc>https://portal.campconnect.co/</loc>
+  <lastmod>2020-12-08T04:13:36+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+
+<url>
+  <loc>https://portal.campconnect.co/login</loc>
+  <lastmod>2020-12-08T04:13:36+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+
+<url>
+  <loc>https://portal.campconnect.co/support</loc>
+  <lastmod>2020-12-08T04:13:36+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+
+<url>
+  <loc>https://portal.campconnect.co/schedules</loc>
+  <lastmod>2020-12-08T04:13:36+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+
+<url>
+  <loc>https://portal.campconnect.co/facilitators</loc>
+  <lastmod>2020-12-08T04:13:36+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+
+<url>
+  <loc>https://portal.campconnect.co/resources</loc>
+  <lastmod>2020-12-08T04:13:36+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+
+<url>
+  <loc>https://portal.campconnect.co/logout</loc>
+  <lastmod>2020-12-08T04:13:36+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+
+</urlset>
