@@ -116,6 +116,7 @@ def login():
         uid = verify(user, pw)
 
         if uid:
+            log_user_activity(uid, "/login", timestamp)
             session["user"] = uid
             return redirect(url_for("index"))
 
