@@ -124,14 +124,18 @@ def login():
     
     user_id = session.get("user", None)
     if user_id:
-        log_user_activity(user_id, "/login", timestamp)
         return redirect(url_for("index"))
     
     return render_template("login.html", data=data)
 
 @app.route('/logout')
 def logout():
-    session.pop("user", None)
+    timestamp = datetime.now(tz=utc)
+    user_id = session.pop("user", None)
+
+    if user_id:
+        log_user_activity(user_id, "/logout", timestamp)
+
     return(redirect(url_for("login")))
 
 #function to create html anchors
