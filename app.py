@@ -124,7 +124,6 @@ def schedules():
         user_tbl = 'Participant'
         #check if user is fac or ppant
         check = Airtable(BASE_ID, 'Participant', API_KEY).search('ID',user_id)
-
         if(not check):
             user_tbl = 'Facilitator'
 
@@ -147,8 +146,7 @@ def schedules():
         schArr = []
 
         #camp start date for stagger and duration tracker
-        # startdate = datetime(year=2020, month=12, day=26, hour=10, minute=30)
-        durTracker = datetime(year=2020, month=12, day=26, hour=0, minute=0)
+        durTracker = datetime.now()
         if user_data["stagger"]==2:
             startdate = startdate + timedelta(hours=3)
 
