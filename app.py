@@ -2,12 +2,14 @@ import requests
 import os
 import urllib.parse
 import json
+import pytz
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect, session
 from airtable import Airtable
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
 
+utc = pytz.utc
 load_dotenv(dotenv_path="./config.py")
 
 # set the "static" directory as the static folder
@@ -16,6 +18,11 @@ app.secret_key = os.getenv("APP_SECRET")
 
 API_KEY = os.getenv("AIRTABLE_API_KEY")
 BASE_ID = os.getenv("BASE_ID")
+G_ANALYTICS = os.getenv("G_ANALYTICS")
+
+@app.context_processor
+def inject_analytics():
+    return dict(analytics_id=G_ANALYTICS)
 
 def verify(user, pw):
     airtable = Airtable(BASE_ID, 'Authentication', API_KEY)
@@ -27,6 +34,17 @@ def verify(user, pw):
             return user_data[0]["fields"]["ID"]
     
     return False
+
+def log_user_activity(uid, endpoint, timestamp):
+    timestrfmt = "%B %d, %Y %I:%M:%S %p %Z"
+    log = {
+        "uid": uid,
+        "endpoint": endpoint,
+        "timestamp": timestamp.strftime(timestrfmt)
+    }
+
+    log_table = Airtable(BASE_ID, 'Activity Logs', API_KEY)
+    log_table.insert(log)
 
 @app.route('/_post_tz/', methods=['POST'])
 def post_tz():    
@@ -44,32 +62,50 @@ def send_static(path):
 @app.route('/')
 def index():
     user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
+
     if user_id:
+        log_user_activity(user_id, "/", timestamp)
         return render_template("index.html")
     
     return redirect(url_for("login"))
 
 @app.route('/support')
 def support():
+    user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
+
+    if user_id:
+        log_user_activity(user_id, "/support", timestamp)
+    else:
+        log_user_activity(-1, "/support", timestamp)
+    
     return render_template("support.html")
 
 @app.route('/facilitators')
 def facilitators():
     user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
+
     if user_id:
         if user_id < 1010:
             resources = Airtable(BASE_ID, 'Facilitator Resources', API_KEY).get_iter(sort=['Order'])
+            log_user_activity(user_id, "/facilitators", timestamp)
+
             return render_template("facilitators.html", resources=resources)
         else:
             return redirect("/")
+    
     return redirect("/")
 
 @app.route('/resources')
 def resources():
     user_id = session.get("user", None)
-    if user_id:
+    timestamp = datetime.now(tz=utc)
 
+    if user_id:
         resources = Airtable(BASE_ID, 'Resources', API_KEY).get_iter(sort=['Order'])
+        log_user_activity(user_id, "/resources", timestamp)
 
         return render_template("resources.html", resources=resources)
 
@@ -77,6 +113,7 @@ def resources():
 
 @app.route('/login', methods = ["GET", "POST"])
 def login():
+    timestamp = datetime.now(tz=utc)
     data = {
         "invalid": False
     }
@@ -88,6 +125,7 @@ def login():
         uid = verify(user, pw)
 
         if uid:
+            log_user_activity(uid, "/login", timestamp)
             session["user"] = uid
             return redirect(url_for("index"))
 
@@ -102,7 +140,12 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop("user", None)
+    timestamp = datetime.now(tz=utc)
+    user_id = session.pop("user", None)
+
+    if user_id:
+        log_user_activity(user_id, "/logout", timestamp)
+
     return(redirect(url_for("login")))
 
 #function to create html anchors
@@ -112,7 +155,10 @@ def htmlanchor(link):
 @app.route('/schedules', methods=['GET', 'POST'])
 def schedules():
     user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
+
     if user_id:
+        log_user_activity(user_id, "/schedules", timestamp)
         
         orientation_start = os.getenv("ORIENTATION_DATETIME")
         camp_start = os.getenv("STAGGER1_START_DATETIME")
@@ -225,5 +271,4 @@ def FUN_500(error):
     return render_template("500.html"), 500    
 
 if __name__ == "__main__":
-    # get_some_data()
     app.run(debug=True, host="localhost")
