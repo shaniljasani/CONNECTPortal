@@ -46,6 +46,15 @@ def log_user_activity(uid, endpoint, timestamp):
     log_table = Airtable(BASE_ID, 'Activity Logs', API_KEY)
     log_table.insert(log)
 
+@app.route('/_post_tz/', methods=['POST'])
+def post_tz():    
+    data = request.get_json()
+
+    session["timezone"] = data['timezone']
+    session["offset"] = data['offset']
+
+    return ('', 204)
+
 @app.route('/<path:path>')
 def send_static(path):
     return send_from_directory('static', path)
@@ -150,11 +159,17 @@ def schedules():
 
     if user_id:
         log_user_activity(user_id, "/schedules", timestamp)
+        
+        orientation_start = os.getenv("ORIENTATION_DATETIME")
+        camp_start = os.getenv("STAGGER1_START_DATETIME")
 
+        orientation = datetime.strptime(orientation_start, '%Y-%m-%d %H:%M')
+        startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
+
+        #fix this, use set id ranges
         user_tbl = 'Participant'
         #check if user is fac or ppant
         check = Airtable(BASE_ID, 'Participant', API_KEY).search('ID',user_id)
-
         if(not check):
             user_tbl = 'Facilitator'
 
@@ -165,8 +180,10 @@ def schedules():
                 user_data["familyLink"] = record['fields']['FamilyLink'][0]
                 user_data["cabinLink"] = record['fields']['CabinLink'][0]
                 user_data["createLink"] = record['fields']['CreateLink'][0]
-                user_data["timezone"] = record['fields']['TimeZoneString'][0]
-                user_data["offset"] = record['fields']['OffsetString'][0]
+                # user_data["timezone"] = record['fields']['TimeZoneString'][0]
+                # user_data["offset"] = record['fields']['OffsetString'][0]
+                user_data["timezone"] = session.get("timezone", None)
+                user_data["offset"] = -1 * session.get("offset", None) #momentjs returns the inverse value
 
         #get sch data using ppant stagger
         schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}={user_data["stagger"]}',sort=['Day', '-Order']) # -order because they're put in backwards in the for loop
@@ -175,22 +192,24 @@ def schedules():
         schArr = []
 
         #camp start date for stagger and duration tracker
-        startdate = datetime(year=2020, month=12, day=26, hour=10, minute=30)
-        durTracker = datetime(year=2020, month=12, day=26, hour=0, minute=0)
+        durTracker = datetime.now()
         if user_data["stagger"]==2:
-            startdate = datetime(year=2020, month=12, day=26, hour=13, minute=30)
+            startdate = startdate + timedelta(hours=3)
 
         #day tracker 
-        day = 0
+        day = -1
         for record in schInfo:
             schData = {}
 
             #DateTime Ranges
             duration = schInfo[len(schArr)]['fields']['Duration']
 
-            if(day != schInfo[len(schArr)]['fields']['Day']):
+            if day != schInfo[len(schArr)]['fields']['Day']:
                 day = schInfo[len(schArr)]['fields']['Day']
-                durTracker = startdate + timedelta(days=(day-1), hours=user_data["offset"])
+                if day == 0:
+                    durTracker = orientation + timedelta(minutes=user_data["offset"])
+                else:
+                    durTracker = startdate + timedelta(days=(day-1), minutes=user_data["offset"])
 
             schData[1] = durTracker
             durTracker = durTracker + timedelta(minutes=duration)
@@ -220,8 +239,10 @@ def schedules():
 
         #get camp day #, default to 1
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
+        orientationday = orientation.day
+        startday = startdate.day
 
-        return render_template('schedules.html', data=schArr, campday=campday)
+        return render_template('schedules.html', data=schArr, campday=campday, startday=startday, orientationday=orientationday)
     
     return redirect(url_for("login"))
 
