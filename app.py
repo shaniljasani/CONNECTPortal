@@ -181,7 +181,6 @@ def schedules():
             for record in page:
                 user_data["stagger"] = record['fields']['Stagger'][0]
                 user_data["familyLink"] = record['fields']['FamilyLink'][0]
-                print(record['fields']['CabinLink'])
                 user_data["cabinLink"] = record['fields']['CabinLink'][0]
                 user_data["createLink"] = record['fields']['CreateLink'][0]
                 # user_data["timezone"] = record['fields']['TimeZoneString'][0]
@@ -229,7 +228,6 @@ def schedules():
 
             #Zoom Link
             if 'cabin' in str.lower(schData[2]):
-                print(user_data["cabinLink"])
                 schData[3] = htmlanchor(user_data["cabinLink"])
             elif 'transition' in str.lower(schData[2]):
                 schData[3] = 'Transition'
