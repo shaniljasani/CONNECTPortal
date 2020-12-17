@@ -160,18 +160,9 @@ def schedules():
     if user_id:
         log_user_activity(user_id, "/schedules", timestamp)
         
-        orientation_start = os.getenv("ORIENTATION_DATETIME")
-        camp_start = os.getenv("STAGGER1_START_DATETIME")
-
-        orientation = datetime.strptime(orientation_start, '%Y-%m-%d %H:%M')
-        startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
-
-        #fix this, use set id ranges
-        user_tbl = 'Participant'
-        #check if user is fac or ppant
-        check = Airtable(BASE_ID, 'Participant', API_KEY).search('ID',user_id)
-        if(not check):
-            user_tbl = 'Facilitator'
+        user_tbl = 'Facilitator'
+        if(user_id>2999):
+            user_tbl = 'Participant'
 
         user_data = {}
         for page in Airtable(BASE_ID, user_tbl, API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
@@ -186,15 +177,20 @@ def schedules():
                 user_data["offset"] = -1 * session.get("offset", None) #momentjs returns the inverse value
 
         #get sch data using ppant stagger
-        schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}={user_data["stagger"]}',sort=['Day', '-Order']) # -order because they're put in backwards in the for loop
+        print(user_data["stagger"])
+        schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', '-Order']) # -order because they're put in backwards in the for loop
 
         #list that will store organize the schData objects for the table
         schArr = []
 
         #camp start date for stagger and duration tracker
         durTracker = datetime.now()
-        if user_data["stagger"]==2:
-            startdate = startdate + timedelta(hours=3)
+
+        orientation_day = os.getenv("ORIENTATION_DAY")
+        camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
+
+        startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
+        orientation = datetime.strptime(orientation_day, '%Y-%m-%d').replace(hour=startdate.hour, minute=startdate.minute)
 
         #day tracker 
         day = -1
