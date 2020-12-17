@@ -46,6 +46,18 @@ def log_user_activity(uid, endpoint, timestamp):
     log_table = Airtable(BASE_ID, 'Activity Logs', API_KEY)
     log_table.insert(log)
 
+def log_error(uid, endpoint, timestamp, desc):
+    timestrfmt = "%B %d, %Y %I:%M:%S %p %Z"
+    err_log = {
+        "uid": uid,
+        "endpoint": endpoint,
+        "timestamp": timestamp.strftime(timestrfmt),
+        "description": desc
+    }
+
+    err_log_table = Airtable(BASE_ID, 'Error Logs', API_KEY)
+    err_log_table.insert(err_log)
+
 @app.route('/_post_tz/', methods=['POST'])
 def post_tz():    
     data = request.get_json()
@@ -177,7 +189,6 @@ def schedules():
                 user_data["offset"] = -1 * session.get("offset", None) #momentjs returns the inverse value
 
         #get sch data using ppant stagger
-        print(user_data["stagger"])
         schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', '-Order']) # -order because they're put in backwards in the for loop
 
         #list that will store organize the schData objects for the table
@@ -252,18 +263,47 @@ def FUN_403(error):
 
 @app.errorhandler(404)
 def FUN_404(error):
+    uid = session.get("user", None)
+
+    if not uid:
+        uid = -1
+
+    time = datetime.now(tz=utc)
+    log_error(uid, request.path, time, str(error))
     return render_template("404.html"), 404
 
 @app.errorhandler(405)
 def FUN_405(error):
+    uid = session.get("user", None)
+
+    if not uid:
+        uid = -1
+
+    time = datetime.now(tz=utc)
+    log_error(uid, request.path, time, str(error))
     return render_template("405.html"), 405
 
 @app.errorhandler(413)
 def FUN_413(error):
+    uid = session.get("user", None)
+
+    if not uid:
+        uid = -1
+
+    time = datetime.now(tz=utc)
+    log_error(uid, request.path, time, str(error))
     return render_template("413.html"), 413
 
 @app.errorhandler(500)
 def FUN_500(error):
+    print("500 Error!!")
+    uid = session.get("user", None)
+
+    if not uid:
+        uid = -1
+
+    time = datetime.now(tz=utc)
+    log_error(uid, request.path, time, str(error))
     return render_template("500.html"), 500    
 
 if __name__ == "__main__":
