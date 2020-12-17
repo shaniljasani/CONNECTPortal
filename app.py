@@ -169,6 +169,7 @@ def schedules():
             for record in page:
                 user_data["stagger"] = record['fields']['Stagger'][0]
                 user_data["familyLink"] = record['fields']['FamilyLink'][0]
+                print(record['fields']['CabinLink'])
                 user_data["cabinLink"] = record['fields']['CabinLink'][0]
                 user_data["createLink"] = record['fields']['CreateLink'][0]
                 # user_data["timezone"] = record['fields']['TimeZoneString'][0]
@@ -177,8 +178,7 @@ def schedules():
                 user_data["offset"] = -1 * session.get("offset", None) #momentjs returns the inverse value
 
         #get sch data using ppant stagger
-        print(user_data["stagger"])
-        schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', '-Order']) # -order because they're put in backwards in the for loop
+        schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', 'Order'])
 
         #list that will store organize the schData objects for the table
         schArr = []
@@ -216,25 +216,28 @@ def schedules():
             schData[2] = schInfo[len(schArr)]['fields']['ActivityType']
 
             #Zoom Link
-            if 'Cabin' in schData[2]:
+            if 'cabin' in str.lower(schData[2]):
+                print(user_data["cabinLink"])
                 schData[3] = htmlanchor(user_data["cabinLink"])
-            elif 'Transition' in schData[2]:
+            elif 'transition' in str.lower(schData[2]):
                 schData[3] = 'Transition'
-            elif 'Gather' in schData[2]:
+            elif 'gather' in str.lower(schData[2]):
                 schData[3] = htmlanchor(user_data["familyLink"])
-            elif 'Break' in schData[2]:
+            elif 'break' in str.lower(schData[2]):
                 schData[3] = 'Break'
-            elif 'Create' in schData[2]:
+            elif 'create' in str.lower(schData[2]):
                 schData[3] = htmlanchor(user_data["createLink"])
-            elif 'Explore' in schData[2]:
+            elif 'explore' in str.lower(schData[2]):
                 schData[3] = htmlanchor(user_data["familyLink"])
+            elif 'WebinarLink' in schInfo[len(schArr)]['fields']:
+                schData[3] = htmlanchor(schInfo[len(schArr)]['fields']['WebinarLink'])
             else:
-                schData[3]=schData[2]
+                schData[3] = schData[2]
             
             schArr.append(schData)
 
-        #get camp day #, default to 1
-        campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
+        #get camp day #, default to 0
+        campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 0
         orientationday = orientation.day
         startday = startdate.day
 
