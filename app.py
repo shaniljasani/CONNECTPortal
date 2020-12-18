@@ -162,6 +162,8 @@ def logout():
 
 #function to create html anchors
 def htmlanchor(link):
+    if link=='Visit HelpDesk':
+        return "<a href='https://link.campconnect.co/helpdesk' target='_blank'>" + link + "</a>"
     return "<a href='" + link + "' target='_blank'>" + link + "</a>"
 
 @app.route('/schedules', methods=['GET', 'POST'])
@@ -180,9 +182,9 @@ def schedules():
         for page in Airtable(BASE_ID, user_tbl, API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
             for record in page:
                 user_data["stagger"] = record['fields']['Stagger'][0]
-                user_data["familyLink"] = record['fields']['FamilyLink'][0]
-                user_data["cabinLink"] = record['fields']['CabinLink'][0]
-                user_data["createLink"] = record['fields']['CreateLink'][0]
+                user_data["familyLink"] = record['fields']['FamilyLink'][0] if ('FamilyLink' in record['fields']) else 'Visit HelpDesk'
+                user_data["cabinLink"] = record['fields']['CabinLink'][0] if ('CabinLink' in record['fields']) else 'Visit HelpDesk'
+                user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
                 # user_data["timezone"] = record['fields']['TimeZoneString'][0]
                 # user_data["offset"] = record['fields']['OffsetString'][0]
                 user_data["timezone"] = session.get("timezone", None)
