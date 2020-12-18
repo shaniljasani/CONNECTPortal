@@ -199,11 +199,11 @@ def schedules():
         #camp start date for stagger and duration tracker
         durTracker = datetime.now()
 
-        orientation_day = os.getenv("ORIENTATION_DAY")
+        orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
         camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
 
+        orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
         startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
-        orientation = datetime.strptime(orientation_day, '%Y-%m-%d').replace(hour=startdate.hour, minute=startdate.minute)
 
         #day tracker 
         day = -1
