@@ -154,6 +154,8 @@ def login():
 def logout():
     timestamp = datetime.now(tz=utc)
     user_id = session.pop("user", None)
+    user_id = session.pop("timezone", None)
+    user_id = session.pop("offset", None)
 
     if user_id:
         log_user_activity(user_id, "/logout", timestamp)
@@ -187,8 +189,8 @@ def schedules():
                 user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
                 # user_data["timezone"] = record['fields']['TimeZoneString'][0]
                 # user_data["offset"] = record['fields']['OffsetString'][0]
-                user_data["timezone"] = session.get("timezone", None)
-                user_data["offset"] = -1 * session.get("offset", None) #momentjs returns the inverse value
+                user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'GMT'
+                user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
 
         #get sch data using ppant stagger
         schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', 'Order'])
