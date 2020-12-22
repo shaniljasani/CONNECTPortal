@@ -248,14 +248,13 @@ def schedules():
             else:
                 schData[3] = schData[2]
             
+            schData[4] = schInfo[len(schArr)]['fields']['Day']
             schArr.append(schData)
 
-        #get camp day #, default to 0
-        campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 0
-        orientationday = orientation.day
-        startday = startdate.day
+        #get camp day #, default to 1
+        campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
 
-        return render_template('schedules.html', data=schArr, campday=campday, startday=startday, orientationday=orientationday)
+        return render_template('schedules.html', data=schArr, campday=campday)
     
     return redirect(url_for("login"))
 

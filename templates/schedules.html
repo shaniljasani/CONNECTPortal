@@ -92,9 +92,6 @@
 {% block script %}
 <script>
   var schTable;
-
-  var startday = {{startday}};
-  var orientationday = {{orientationday}}
   
   $(document).ready(function () {
     var campday = {{campday}};
@@ -138,7 +135,13 @@
                   }], 
                   "bSort": false,
                   "bInfo": false,
-                  "paging": false
+                  "paging": false,
+                  "columnDefs": [
+                        {
+                            "targets": [4],
+                            "visible": false,
+                        },
+                    ]
                 });
     $('#lblCampday').text(campday)
     $("#ddDay").val(campday).change();
@@ -163,26 +166,15 @@
     let val = parseInt(this.value)
     $('#lblCampday').text(val)
 
-    if(val==0){
-      $.fn.dataTable.ext.search.push(
+    
+    $.fn.dataTable.ext.search.push(
       function( settings, data, dataIndex ) {
-          if (data[0].indexOf(orientationday) > 0)
-          {
-              return true;
-          }
-          return false;
-      })
-    }
-    else{
-      $.fn.dataTable.ext.search.push(
-      function( settings, data, dataIndex ) {
-          if (data[0].indexOf(startday+val-1) > 0)
-          {
-              return true;
-          }
-          return false;
-      })
-    }
+        if (data[4] == val)
+        {
+            return true;
+        }
+        return false;
+    })
     schTable.draw();
   });
 
