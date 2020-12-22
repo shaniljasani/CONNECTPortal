@@ -1,4 +1,5 @@
 import os
+import requests
 
 from dotenv import load_dotenv
 from airtable import Airtable
@@ -83,7 +84,7 @@ for user_id, reference_id in users.items():
 
     records[batch].append({
       "ID": int(user_id),
-      "Password": "Apple"
+      "Password": requests.get(http://www.dinopass.com/password/simple).text
     })
     record_iteration += 1
 
