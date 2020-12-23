@@ -123,6 +123,25 @@ def resources():
 
     return redirect(url_for("login"))
 
+@app.route('/profile')
+def profile():
+    user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
+
+    if user_id:
+        user_info = Airtable(BASE_ID, 'Participant', API_KEY).search("ID", user_id)[0]["fields"]
+        family_info = Airtable(BASE_ID, 'Family', API_KEY)
+        data = {
+            "name": user_info["Participant Name"][0],
+            "family": family_info.get(user_info["Family"][0])["fields"]["Name"]
+        }
+        print(data)
+        log_user_activity(user_id, "/profile", timestamp)
+
+        return render_template("profile.html", user_data=data)
+
+    return redirect(url_for("login"))
+
 @app.route('/login', methods = ["GET", "POST"])
 def login():
     timestamp = datetime.now(tz=utc)
