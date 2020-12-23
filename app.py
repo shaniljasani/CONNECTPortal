@@ -135,7 +135,7 @@ def profile():
             "name": user_info["Participant Name"][0],
             "family": family_info.get(user_info["Family"][0])["fields"]["Name"]
         }
-        print(data)
+
         log_user_activity(user_id, "/profile", timestamp)
 
         return render_template("profile.html", user_data=data)
