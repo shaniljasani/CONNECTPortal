@@ -50,7 +50,8 @@
               <div class="col-lg-6">
                 <div class="p-5">
                   <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                    <h1 class="h4 text-gray-900 mb-4">Welcome!</h1>
+                    <p>Access the CONNECT Portal by entering your ID Number and Passcode</p>
                   </div>
                   {% if data.invalid %}
                     <div class="alert alert-danger" role="alert">
@@ -59,21 +60,28 @@
                   {% endif %}
                   <form class="user" action="/login" method="POST">
                     <div class="form-group">
-                      <input required name="id" type="text" class="form-control form-control-user" id="campID" aria-describedby="campIDHelp" placeholder="Enter Your Camp ID...">
+                      <input required name="id" type="text" class="form-control form-control-user" id="campID" aria-describedby="campIDHelp" placeholder="ID Number">
                     </div>
                     <div class="form-group">
-                      <input required name="pw" type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="PIN">
+                      <input required name="pw" type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Passcode">
                     </div>
+                    
+                    <div class="form-group">
+                      <div class="custom-control custom-checkbox small">
+                          <input type="checkbox" class="custom-control-input" onclick="viewPassword()" id="customCheck">
+                          <label class="custom-control-label" for="customCheck">View Passcode</label>
+                      </div>
+
+                      <hr>
+
                     <button type="submit" class="btn btn-primary btn-user btn-block">
                       Login
                     </button>
+
                     
-                    <!-- <a href="/" class="btn btn-google btn-user btn-block">
-                      <i class="fab fa-google fa-fw"></i> Login with Google
-                    </a>
-                    <a href="/" class="btn btn-facebook btn-user btn-block">
-                      <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook
-                    </a> -->
+                  </div>
+
+
                   </form>
                   <hr>
                   <div class="text-center">
@@ -108,6 +116,16 @@
   <!--User Timezone-->
   <script src="static/vendor/moment/moment.min.js"></script>
   <script src="static/vendor/moment/moment-timezone-with-data-10-year-range.min.js"></script>
+  <script>
+    function viewPassword() {
+      var x = document.getElementById("exampleInputPassword");
+      if (x.type === "password") {
+        x.type = "text";
+      } else {
+        x.type = "password";
+      }
+    }
+  </script>
   <script>
 
     $(document).ready(function() {
