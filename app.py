@@ -166,6 +166,8 @@ def logout():
 def htmlanchor(link):
     if link=='Visit HelpDesk':
         return "<a href='https://link.campconnect.co/helpdesk' target='_blank'>" + link + "</a>"
+    elif link=='lounge':
+        return '<a href="#lounge">Lounge Links</a>'
     return "<a href='" + link + "' target='_blank'>" + link + "</a>"
 
 @app.route('/schedules', methods=['GET', 'POST'])
@@ -191,9 +193,12 @@ def schedules():
                 # user_data["offset"] = record['fields']['OffsetString'][0]
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'GMT'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
+                if(user_data["stagger"] == 'C'):
+                    user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
 
         #get sch data using ppant stagger
-        schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', 'Order'])
+        schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
+        schInfo = Airtable(BASE_ID, schedule_tbl, API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', 'Order'])
 
         #list that will store organize the schData objects for the table
         schArr = []
@@ -206,6 +211,9 @@ def schedules():
 
         orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
         startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
+
+        #stagger c flag for cabin opening links
+        c_flag = False
 
         #day tracker 
         day = -1
@@ -232,13 +240,21 @@ def schedules():
 
             #Zoom Link
             if 'cabin' in str.lower(schData[2]):
-                schData[3] = htmlanchor(user_data["cabinLink"])
+                if user_data["stagger"] != 'C':
+                    schData[3] = htmlanchor(user_data["cabinLink"])
+                else:
+                    if c_flag == False:
+                        schData[3] = htmlanchor(user_data["cabinLink2"])
+                        c_flag = True
+                    else:
+                        schData[3] = htmlanchor(user_data["cabinLink"])
+                        c_flag = False
             elif 'transition' in str.lower(schData[2]):
                 schData[3] = 'Transition'
             elif 'gather' in str.lower(schData[2]):
                 schData[3] = htmlanchor(user_data["familyLink"])
             elif 'break' in str.lower(schData[2]):
-                schData[3] = 'Break'
+                schData[3] = htmlanchor('lounge')
             elif 'create' in str.lower(schData[2]):
                 schData[3] = htmlanchor(user_data["createLink"])
             elif 'explore' in str.lower(schData[2]):
