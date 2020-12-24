@@ -3,6 +3,7 @@ import os
 import urllib.parse
 import json
 import pytz
+import git
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect, session
@@ -57,6 +58,18 @@ def log_error(uid, endpoint, timestamp, desc):
 
     err_log_table = Airtable(BASE_ID, 'Error Logs', API_KEY)
     err_log_table.insert(err_log)
+
+app = Flask(__name__)
+
+@app.route('/github_webhook', methods=['POST'])
+def webhook():
+    if request.method == 'POST':
+        repo = git.Repo('./')
+        origin = repo.remotes.origin
+        origin.pull()
+        return '', 200
+    else:
+        return '', 400
 
 @app.route('/_post_tz/', methods=['POST'])
 def post_tz():    
