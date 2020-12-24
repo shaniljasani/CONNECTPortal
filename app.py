@@ -189,16 +189,27 @@ def schedules():
                 user_data["familyLink"] = record['fields']['FamilyLink'][0] if ('FamilyLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["cabinLink"] = record['fields']['CabinLink'][0] if ('CabinLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
-                # user_data["timezone"] = record['fields']['TimeZoneString'][0]
-                # user_data["offset"] = record['fields']['OffsetString'][0]
+                user_data["family"] = record['fields']['FamName'][0][1] if ('Family' in record['fields']) else 'Visit HelpDesk'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'GMT'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
                 if(user_data["stagger"] == 'C'):
                     user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
 
+        print(user_data["family"])
+        orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
+        camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
+
+        orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
+        startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
+
+        formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1,{{FacOnly}}!=1)'
+        if(user_id<3000):
+            formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1)'
+            startdate = startdate + timedelta(hours=-1)
+
         #get sch data using ppant stagger
         schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
-        schInfo = Airtable(BASE_ID, schedule_tbl, API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', 'Order'])
+        schInfo = Airtable(BASE_ID, schedule_tbl, API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
 
         #list that will store organize the schData objects for the table
         schArr = []
@@ -206,14 +217,8 @@ def schedules():
         #camp start date for stagger and duration tracker
         durTracker = datetime.now()
 
-        orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
-        camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
-
-        orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
-        startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
-
-        #stagger c flag for cabin opening links
-        c_flag = False
+        #stagger c counter for cabin opening links
+        c_count = 1
 
         #day tracker 
         day = -1
@@ -236,29 +241,29 @@ def schedules():
             schData[1] = datetime.strftime(schData[1], "%I:%M %p") + ' - ' + datetime.strftime(durTracker, "%I:%M %p") + ' ' + user_data["timezone"]
 
             #Activity
-            schData[2] = schInfo[len(schArr)]['fields']['ActivityType']
+            location = schInfo[len(schArr)]['fields']['ActivityType']
+            schData[2] = schInfo[len(schArr)]['fields']['Description'] if 'Description' in schInfo[len(schArr)]['fields'] else location
 
             #Zoom Link
-            if 'cabin' in str.lower(schData[2]):
+            if 'cabin' in str.lower(location):
                 if user_data["stagger"] != 'C':
                     schData[3] = htmlanchor(user_data["cabinLink"])
                 else:
-                    if c_flag == False:
+                    if c_count%3 != 0:
                         schData[3] = htmlanchor(user_data["cabinLink2"])
-                        c_flag = True
                     else:
                         schData[3] = htmlanchor(user_data["cabinLink"])
-                        c_flag = False
-            elif 'transition' in str.lower(schData[2]):
+                    c_count += 1
+            elif 'transition' in str.lower(location):
                 schData[3] = 'Transition'
-            elif 'gather' in str.lower(schData[2]):
+            elif 'family' in str.lower(location):
                 schData[3] = htmlanchor(user_data["familyLink"])
-            elif 'break' in str.lower(schData[2]):
+            elif 'break' in str.lower(location):
                 schData[3] = htmlanchor('lounge')
-            elif 'create' in str.lower(schData[2]):
+            elif 'create' in str.lower(location):
                 schData[3] = htmlanchor(user_data["createLink"])
-            elif 'explore' in str.lower(schData[2]):
-                schData[3] = htmlanchor(user_data["familyLink"])
+            elif 'briefing' in str.lower(location):
+                schData[3] = htmlanchor("https://campconnect-co.zoom.us/my/connectfcd" + user_data["family"])
             elif 'WebinarLink' in schInfo[len(schArr)]['fields']:
                 schData[3] = htmlanchor(schInfo[len(schArr)]['fields']['WebinarLink'])
             else:
