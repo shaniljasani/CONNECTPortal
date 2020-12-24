@@ -110,6 +110,21 @@ def facilitators():
     
     return redirect("/")
 
+@app.route('/staff')
+def facilitators():
+    user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
+
+    if user_id:
+        if user_id > 9999:
+            log_user_activity(user_id, "/staff", timestamp)
+            return render_template("staff.html")
+
+        else:
+            return redirect("/")
+            
+    return redirect("/")
+
 @app.route('/resources')
 def resources():
     user_id = session.get("user", None)
