@@ -191,6 +191,7 @@ def schedules():
                 # user_data["offset"] = record['fields']['OffsetString'][0]
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'GMT'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
+                user_data["family"] = record['fields']['Family'][0] if ('Family' in record['fields']) else 'no'
 
         #get sch data using ppant stagger
         schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', 'Order'])
@@ -254,7 +255,10 @@ def schedules():
         #get camp day #, default to 1
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
 
-        return render_template('schedules.html', data=schArr, campday=campday)
+        # get family for jodav notice 
+        farsi = ( user_data['family'] == 'recJPqH4Jh3tMi3DN' )
+
+        return render_template('schedules.html', data=schArr, campday=campday, farsi=farsi)
     
     return redirect(url_for("login"))
 
