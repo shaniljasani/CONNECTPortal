@@ -59,8 +59,6 @@ def log_error(uid, endpoint, timestamp, desc):
     err_log_table = Airtable(BASE_ID, 'Error Logs', API_KEY)
     err_log_table.insert(err_log)
 
-app = Flask(__name__)
-
 @app.route('/github_webhook', methods=['POST'])
 def webhook():
     if request.method == 'POST':
