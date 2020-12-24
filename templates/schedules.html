@@ -104,13 +104,11 @@ View your personalized CONNECT Schedule.
     var html="";
     timezones = moment.tz.names();
   
-    for(var i=0; i<timezones.length; i++){
-      console.log(timezones[i]);
-      
+    for(var i=0; i<timezones.length; i++){  
       if (timezones[i] == "{{tz_region | string}}") {
-        html +="<option selected>"+timezones[i] + " (" + moment.tz(timezones[i]).format('z') + ")" +"</option>";
+        html +="<option selected value='" + timezones[i] + "'>"+timezones[i] + " (" + moment.tz(timezones[i]).format('z') + ")" +"</option>";
       } else {
-        html +="<option>"+timezones[i] + " (" + moment.tz(timezones[i]).format('z') + ")" +"</option>";
+        html +="<option value='" + timezones[i] + "'>"+timezones[i] + " (" + moment.tz(timezones[i]).format('z') + ")" +"</option>";
       }
     }
   
@@ -118,7 +116,6 @@ View your personalized CONNECT Schedule.
   }
   
   $(document).ready(function () {
-    console.log(document.cookie)
     populateTzSelect();
 
     var campday = {{campday}};
@@ -204,6 +201,21 @@ View your personalized CONNECT Schedule.
     })
     schTable.draw();
   });
+
+  $('#timezone').on('change', function() {
+    var tz = this.value;
+
+    $.ajax({
+      type: "POST",
+      url: "{{ url_for('post_tz') }}",
+      contentType: "application/json",
+      data: JSON.stringify({region: tz, timezone: moment().tz(tz).format("z"), offset: moment.tz.zone(tz).utcOffset(new Date)}),
+      dataType: "json",
+      complete: function() {
+        window.location.reload(true);
+      }
+    });
+  })
 
 </script>
 {% endblock %}
