@@ -3,6 +3,7 @@ import os
 import urllib.parse
 import json
 import pytz
+import git
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect, session
@@ -58,12 +59,23 @@ def log_error(uid, endpoint, timestamp, desc):
     err_log_table = Airtable(BASE_ID, 'Error Logs', API_KEY)
     err_log_table.insert(err_log)
 
+@app.route('/github_webhook', methods=['POST'])
+def webhook():
+    if request.method == 'POST':
+        repo = git.Repo('./')
+        origin = repo.remotes.origin
+        origin.pull()
+        return '', 200
+    else:
+        return '', 400
+
 @app.route('/_post_tz/', methods=['POST'])
 def post_tz():    
     data = request.get_json()
 
     session["timezone"] = data['timezone']
     session["offset"] = data['offset']
+    session["tz_region"] = data['region']
 
     return ('', 204)
 
@@ -153,9 +165,9 @@ def login():
 @app.route('/logout')
 def logout():
     timestamp = datetime.now(tz=utc)
+    session.pop("timezone", None)
+    session.pop("offset", None)
     user_id = session.pop("user", None)
-    user_id = session.pop("timezone", None)
-    user_id = session.pop("offset", None)
 
     if user_id:
         log_user_activity(user_id, "/logout", timestamp)
@@ -190,7 +202,7 @@ def schedules():
                 user_data["cabinLink"] = record['fields']['CabinLink'][0] if ('CabinLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["family"] = record['fields']['FamName'][0][1] if ('Family' in record['fields']) else 'Visit HelpDesk'
-                user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'GMT'
+                user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
                 if(user_data["stagger"] == 'C'):
                     user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
@@ -274,8 +286,9 @@ def schedules():
 
         #get camp day #, default to 1
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
+        region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
-        return render_template('schedules.html', data=schArr, campday=campday)
+        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region)
     
     return redirect(url_for("login"))
 
