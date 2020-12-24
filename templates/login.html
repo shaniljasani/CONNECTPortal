@@ -102,7 +102,6 @@
     </div>
 
   </div>
-
   <!-- Bootstrap core JavaScript-->
   <script src="static/vendor/jquery/jquery.min.js"></script>
   <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -129,13 +128,13 @@
   <script>
 
     $(document).ready(function() {
-      var tz = moment.tz.guess();
+      var tz = moment.tz.guess() ? moment.tz.guess() : "Etc/UTC";
 
       $.ajax({
       type: "POST",
       url: "{{ url_for('post_tz') }}",
       contentType: "application/json",
-      data: JSON.stringify({timezone: moment().tz(tz).format("z"), offset: moment.tz.zone(tz).utcOffset(new Date)}),
+      data: JSON.stringify({region: tz, timezone: moment().tz(tz).format("z"), offset: moment.tz.zone(tz).utcOffset(new Date)}),
       dataType: "json",
       });
     });
