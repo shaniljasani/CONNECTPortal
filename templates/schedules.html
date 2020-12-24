@@ -1,6 +1,13 @@
 {% extends "dashboard_layout.html" %}
-{% block page_title %}My Schedule{% endblock %}
-{% block page_description %}View your personalized CONNECT Schedule.{% endblock %}
+
+{% block page_title %}
+My Schedule
+{% endblock %}
+
+{% block page_description %}
+View your personalized CONNECT Schedule.
+{% endblock %}
+
 {% block body %}
 {{ super() }}
 
@@ -42,6 +49,7 @@
           <option value="4">Day 4</option>
           <option value="5">Day 5</option>
         </select>
+        <select name="timezone" id="timezone" class="form-control"></select>
       </div>
     </div>
   </div>
@@ -87,15 +95,29 @@
 </div>
 
 <div id="lounge"></div>
-
 {% endblock %}
-<!-- /.container-fluid -->
-
 {% block script %}
 <script>
   var schTable;
+
+  function populateTzSelect(){
+    var html="";
+    timezones = moment.tz.names();
+  
+    for(var i=0; i<timezones.length; i++){  
+      if (timezones[i] == "{{tz_region | string}}") {
+        html +="<option selected value='" + timezones[i] + "'>"+timezones[i] + " (" + moment.tz(timezones[i]).format('z') + ")" +"</option>";
+      } else {
+        html +="<option value='" + timezones[i] + "'>"+timezones[i] + " (" + moment.tz(timezones[i]).format('z') + ")" +"</option>";
+      }
+    }
+  
+    document.getElementById('timezone').innerHTML=html;
+  }
   
   $(document).ready(function () {
+    populateTzSelect();
+
     var campday = {{campday}};
     
     schTable = $('#schTable')
@@ -179,6 +201,21 @@
     })
     schTable.draw();
   });
+
+  $('#timezone').on('change', function() {
+    var tz = this.value;
+
+    $.ajax({
+      type: "POST",
+      url: "{{ url_for('post_tz') }}",
+      contentType: "application/json",
+      data: JSON.stringify({region: tz, timezone: moment().tz(tz).format("z"), offset: moment.tz.zone(tz).utcOffset(new Date)}),
+      dataType: "json",
+      complete: function() {
+        window.location.reload(true);
+      }
+    });
+  })
 
 </script>
 {% endblock %}
