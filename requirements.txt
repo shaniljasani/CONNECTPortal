@@ -3,3 +3,4 @@ python-dotenv
 requests
 airtable-python-wrapper
 pytz
+gitpython
