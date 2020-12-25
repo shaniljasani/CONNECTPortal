@@ -199,9 +199,13 @@ def schedules():
             for record in page:
                 user_data["stagger"] = record['fields']['Stagger'][0]
                 user_data["familyLink"] = record['fields']['FamilyLink'][0] if ('FamilyLink' in record['fields']) else 'Visit HelpDesk'
+                if(user_data["stagger"] == 'C'):
+                    user_data["familyLink2"] = record['fields']['JodavCombinedLink'][0] if ('JodavCombinedLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["cabinLink"] = record['fields']['CabinLink'][0] if ('CabinLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["family"] = record['fields']['FamName'][0][1] if ('Family' in record['fields']) else 'Visit HelpDesk'
+                if(user_data["stagger"] == 'C'):
+                    user_data["family"] = '10'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
                 if(user_data["stagger"] == 'C'):
@@ -229,8 +233,9 @@ def schedules():
         #camp start date for stagger and duration tracker
         durTracker = datetime.now()
 
-        #stagger c counter for cabin opening links
+        #stagger c counter for cabin opening links, c=cabin, f=family
         c_count = 1
+        f_count = 1
 
         #day tracker 
         day = -1
@@ -269,7 +274,14 @@ def schedules():
             elif 'transition' in str.lower(location):
                 schData[3] = 'Transition'
             elif 'family' in str.lower(location):
-                schData[3] = htmlanchor(user_data["familyLink"])
+                if user_data["stagger"] != 'C':
+                    schData[3] = htmlanchor(user_data["familyLink"])
+                else:
+                    if f_count%3 != 2:
+                        schData[3] = htmlanchor(user_data["familyLink"])
+                    else:
+                        schData[3] = htmlanchor(user_data["familyLink2"])
+                    f_count += 1
             elif 'break' in str.lower(location):
                 schData[3] = htmlanchor('lounge')
             elif 'create' in str.lower(location):
