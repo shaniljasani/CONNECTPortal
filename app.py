@@ -3,6 +3,7 @@ import os
 import urllib.parse
 import json
 import pytz
+import git
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect, session
@@ -58,12 +59,23 @@ def log_error(uid, endpoint, timestamp, desc):
     err_log_table = Airtable(BASE_ID, 'Error Logs', API_KEY)
     err_log_table.insert(err_log)
 
+@app.route('/github_webhook', methods=['POST'])
+def webhook():
+    if request.method == 'POST':
+        repo = git.Repo('./')
+        origin = repo.remotes.origin
+        origin.pull()
+        return '', 200
+    else:
+        return '', 400
+
 @app.route('/_post_tz/', methods=['POST'])
 def post_tz():    
     data = request.get_json()
 
     session["timezone"] = data['timezone']
     session["offset"] = data['offset']
+    session["tz_region"] = data['region']
 
     return ('', 204)
 
@@ -153,9 +165,9 @@ def login():
 @app.route('/logout')
 def logout():
     timestamp = datetime.now(tz=utc)
+    session.pop("timezone", None)
+    session.pop("offset", None)
     user_id = session.pop("user", None)
-    user_id = session.pop("timezone", None)
-    user_id = session.pop("offset", None)
 
     if user_id:
         log_user_activity(user_id, "/logout", timestamp)
@@ -166,6 +178,8 @@ def logout():
 def htmlanchor(link):
     if link=='Visit HelpDesk':
         return "<a href='https://link.campconnect.co/helpdesk' target='_blank'>" + link + "</a>"
+    elif link=='lounge':
+        return '<a href="#lounge">Lounge Links</a>'
     return "<a href='" + link + "' target='_blank'>" + link + "</a>"
 
 @app.route('/schedules', methods=['GET', 'POST'])
@@ -187,14 +201,28 @@ def schedules():
                 user_data["familyLink"] = record['fields']['FamilyLink'][0] if ('FamilyLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["cabinLink"] = record['fields']['CabinLink'][0] if ('CabinLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
-                # user_data["timezone"] = record['fields']['TimeZoneString'][0]
-                # user_data["offset"] = record['fields']['OffsetString'][0]
-                user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'GMT'
+                user_data["family"] = record['fields']['FamName'][0][1] if ('Family' in record['fields']) else 'Visit HelpDesk'
+                user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
                 user_data["family"] = record['fields']['Family'][0] if ('Family' in record['fields']) else 'no'
+                if(user_data["stagger"] == 'C'):
+                    user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
+
+        print(user_data["family"])
+        orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
+        camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
+
+        orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
+        startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
+
+        formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1,{{FacOnly}}!=1)'
+        if(user_id<3000):
+            formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1)'
+            startdate = startdate + timedelta(hours=-1)
 
         #get sch data using ppant stagger
-        schInfo = Airtable(BASE_ID, 'Schedule', API_KEY).get_all(formula=f'{{Stagger}}=\"{user_data["stagger"]}\"',sort=['Day', 'Order'])
+        schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
+        schInfo = Airtable(BASE_ID, schedule_tbl, API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
 
         #list that will store organize the schData objects for the table
         schArr = []
@@ -202,11 +230,8 @@ def schedules():
         #camp start date for stagger and duration tracker
         durTracker = datetime.now()
 
-        orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
-        camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
-
-        orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
-        startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
+        #stagger c counter for cabin opening links
+        c_count = 1
 
         #day tracker 
         day = -1
@@ -229,21 +254,29 @@ def schedules():
             schData[1] = datetime.strftime(schData[1], "%I:%M %p") + ' - ' + datetime.strftime(durTracker, "%I:%M %p") + ' ' + user_data["timezone"]
 
             #Activity
-            schData[2] = schInfo[len(schArr)]['fields']['ActivityType']
+            location = schInfo[len(schArr)]['fields']['ActivityType']
+            schData[2] = schInfo[len(schArr)]['fields']['Description'] if 'Description' in schInfo[len(schArr)]['fields'] else location
 
             #Zoom Link
-            if 'cabin' in str.lower(schData[2]):
-                schData[3] = htmlanchor(user_data["cabinLink"])
-            elif 'transition' in str.lower(schData[2]):
+            if 'cabin' in str.lower(location):
+                if user_data["stagger"] != 'C':
+                    schData[3] = htmlanchor(user_data["cabinLink"])
+                else:
+                    if c_count%3 != 0:
+                        schData[3] = htmlanchor(user_data["cabinLink2"])
+                    else:
+                        schData[3] = htmlanchor(user_data["cabinLink"])
+                    c_count += 1
+            elif 'transition' in str.lower(location):
                 schData[3] = 'Transition'
-            elif 'gather' in str.lower(schData[2]):
+            elif 'family' in str.lower(location):
                 schData[3] = htmlanchor(user_data["familyLink"])
-            elif 'break' in str.lower(schData[2]):
-                schData[3] = 'Break'
-            elif 'create' in str.lower(schData[2]):
+            elif 'break' in str.lower(location):
+                schData[3] = htmlanchor('lounge')
+            elif 'create' in str.lower(location):
                 schData[3] = htmlanchor(user_data["createLink"])
-            elif 'explore' in str.lower(schData[2]):
-                schData[3] = htmlanchor(user_data["familyLink"])
+            elif 'briefing' in str.lower(location):
+                schData[3] = htmlanchor("https://campconnect-co.zoom.us/my/connectfcd" + user_data["family"])
             elif 'WebinarLink' in schInfo[len(schArr)]['fields']:
                 schData[3] = htmlanchor(schInfo[len(schArr)]['fields']['WebinarLink'])
             else:
@@ -254,11 +287,12 @@ def schedules():
 
         #get camp day #, default to 1
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
+        region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
         # get family for jodav notice 
         farsi = ( user_data['family'] == 'recJPqH4Jh3tMi3DN' )
 
-        return render_template('schedules.html', data=schArr, campday=campday, farsi=farsi)
+        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, farsi=farsi)
     
     return redirect(url_for("login"))
 
