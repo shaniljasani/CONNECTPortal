@@ -135,6 +135,34 @@ def resources():
 
     return redirect(url_for("login"))
 
+@app.route('/profile')
+def profile():
+    user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
+
+    if user_id:
+        user_info = Airtable(BASE_ID, 'Participant', API_KEY).search("ID", user_id)[0]["fields"]
+        family_info = Airtable(BASE_ID, 'Family', API_KEY)
+        cabin_info = Airtable(BASE_ID, 'Cabin', API_KEY)
+        eco_info = Airtable(BASE_ID, 'Eco', API_KEY)
+        create_info = Airtable(BASE_ID, 'Create', API_KEY)
+        
+        data = {
+            "Name": user_info["Participant Name"][0],
+            "Family": family_info.get(user_info["Family"][0])["fields"]["Name"],
+            "Cabin": cabin_info.get(user_info["Cabin"][0])["fields"]["Cabin Name"],
+            "Cabin Facilitator(s)": cabin_info.get(user_info["Cabin"][0])["fields"]["Facilitators Names"],
+            "Create": create_info.get(user_info["Create Room"][0])["fields"]["Workshop Name"],
+            "Eco Workshop": eco_info.get(user_info["EcoWorkshop"][0])["fields"]["EcoName"],
+            "Eco Workshop Facilitator(s)": eco_info.get(user_info["EcoWorkshop"][0])["fields"]["Fac Name"]
+        }
+
+        log_user_activity(user_id, "/profile", timestamp)
+
+        return render_template("profile.html", user_data=data)
+
+    return redirect(url_for("login"))
+
 @app.route('/login', methods = ["GET", "POST"])
 def login():
     timestamp = datetime.now(tz=utc)
