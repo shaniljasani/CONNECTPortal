@@ -237,9 +237,8 @@ def schedules():
         #camp start date for stagger and duration tracker
         durTracker = datetime.now()
 
-        #stagger c counter for cabin opening links, c=cabin, f=family
+        #stagger c counter for cabin opening links
         c_count = 1
-        f_count = 1
 
         #day tracker 
         day = -1
@@ -277,15 +276,10 @@ def schedules():
                     c_count += 1
             elif 'transition' in str.lower(location):
                 schData[3] = 'Transition'
+            elif 'combinedfamily' in str.lower(location):
+                    schData[3] = htmlanchor(user_data["familyLink2"])
             elif 'family' in str.lower(location):
-                if user_data["stagger"] != 'C':
                     schData[3] = htmlanchor(user_data["familyLink"])
-                else:
-                    if f_count%3 != 2:
-                        schData[3] = htmlanchor(user_data["familyLink"])
-                    else:
-                        schData[3] = htmlanchor(user_data["familyLink2"])
-                    f_count += 1
             elif 'break' in str.lower(location):
                 schData[3] = htmlanchor('lounge')
             elif 'create' in str.lower(location):
