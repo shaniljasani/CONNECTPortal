@@ -135,6 +135,34 @@ def resources():
 
     return redirect(url_for("login"))
 
+@app.route('/profile')
+def profile():
+    user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
+
+    if user_id:
+        user_info = Airtable(BASE_ID, 'Participant', API_KEY).search("ID", user_id)[0]["fields"]
+        family_info = Airtable(BASE_ID, 'Family', API_KEY)
+        cabin_info = Airtable(BASE_ID, 'Cabin', API_KEY)
+        eco_info = Airtable(BASE_ID, 'Eco', API_KEY)
+        create_info = Airtable(BASE_ID, 'Create', API_KEY)
+        
+        data = {
+            "Name": user_info["Participant Name"][0],
+            "Family": family_info.get(user_info["Family"][0])["fields"]["Name"],
+            "Cabin": cabin_info.get(user_info["Cabin"][0])["fields"]["Cabin Name"],
+            "Cabin Facilitator(s)": cabin_info.get(user_info["Cabin"][0])["fields"]["Facilitators Names"],
+            "Create": create_info.get(user_info["Create Room"][0])["fields"]["Workshop Name"],
+            "Eco Workshop": eco_info.get(user_info["EcoWorkshop"][0])["fields"]["EcoName"],
+            "Eco Workshop Facilitator(s)": eco_info.get(user_info["EcoWorkshop"][0])["fields"]["Fac Name"]
+        }
+
+        log_user_activity(user_id, "/profile", timestamp)
+
+        return render_template("profile.html", user_data=data)
+
+    return redirect(url_for("login"))
+
 @app.route('/login', methods = ["GET", "POST"])
 def login():
     timestamp = datetime.now(tz=utc)
@@ -209,6 +237,7 @@ def schedules():
                     user_data["family"] = '10'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
+                user_data["family"] = record['fields']['Family'][0] if ('Family' in record['fields']) else 'no'
                 if(user_data["stagger"] == 'C'):
                     user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
 
@@ -300,7 +329,10 @@ def schedules():
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
-        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region)
+        # get family for jodav notice 
+        farsi = ( user_data['family'] == 'recJPqH4Jh3tMi3DN' )
+
+        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, farsi=farsi)
     
     return redirect(url_for("login"))
 

@@ -14,8 +14,35 @@ View your personalized CONNECT Schedule.
 <!-- Page Heading -->
 <!-- <div class="d-sm-flex align-items-center justify-content-between mb-4"> -->
   <h1 class="h3 mb-2 text-gray-800">My Schedule</h1>
-  <p>View your personalized CONNECT Schedule by selecting a day. Then, join your sessions by clicking on the links in your schedule.</p>
+  <p>View your personalized CONNECT Schedule by selecting a day. You may need to manually adjust the time zone. Then, join your sessions by clicking on the links in your schedule.</p>
 <!-- </div> -->
+
+{% if farsi %}
+<!-- Collapsable PDF Card -->
+<div class="card shadow mb-4">
+  <!-- Card Header - Accordion -->
+  <a href="#collapseCardF" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCard2">
+    <h6 class="m-0 font-weight-bold text-primary">Need help?</h6>
+  </a>
+  <!-- Card Content - Collapse -->
+  <div class="collapse show" id="collapseCardF">
+    <div class="card-body">
+      <a href="https://zoom.us/j/3751012925">
+        <!-- <img src="static/img/farsi-message.png" style="height: 2em;"> -->
+        <h3>:اگر مطمئن نیستید کجا بروید یا مشکلی دارید ، لطفاً روی این پیوند کلیک کنید</h3>
+      </a> 
+      <br/>
+      <a href="https://zoom.us/j/3751012925" class="btn btn-primary btn-icon-split">
+        <span class="text">Join Zoom</span>
+        <span class="icon text-white-50">
+          <i class="fas fa-arrow-left"></i>
+        </span>
+    </a>
+      
+    </div>
+  </div>
+</div>
+{% endif %}
 
   <!-- Collapsable Helpdesk Card -->
   <div class="card shadow mb-4">
@@ -40,7 +67,9 @@ View your personalized CONNECT Schedule.
       <div class="col-6">
         <h6 class="m-0 font-weight-bold text-primary">Schedule for Day #<label id="lblCampday"></label></h6>
       </div>
-      <div class="col-6">
+    </div>
+    <div class="row">
+      <div class="col-5">
         <select id="ddDay" class="form-control">
           <option value="0">Orientation</option>
           <option value="1">Day 1</option>
@@ -49,6 +78,9 @@ View your personalized CONNECT Schedule.
           <option value="4">Day 4</option>
           <option value="5">Day 5</option>
         </select>
+      </div>
+      <div class="col-1"></div>
+      <div class="col-6">
         <select name="timezone" id="timezone" class="form-control"></select>
       </div>
     </div>
@@ -102,7 +134,7 @@ View your personalized CONNECT Schedule.
     <div class="card shadow">
       <div class="card-body">
         <strong><a href="#lounge">CONNECT Lounge</a></strong>
-        <div>Lounges are a great way to have fun with others during breaks!</div>
+        <div>Optional spaces to engage in fun activities and interact with the CONNECT family during breaks</div>
       </div>
     </div>
   </div>
