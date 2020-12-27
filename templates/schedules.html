@@ -68,8 +68,11 @@ View your personalized CONNECT Schedule.
         <h6 class="m-0 font-weight-bold text-primary">Schedule for Day #<label id="lblCampday"></label></h6>
       </div>
     </div>
+  </div>
+  <div class="card-body">
     <div class="row">
       <div class="col-5">
+        <label class="small mb-1">Select a Day</label>
         <select id="ddDay" class="form-control">
           <option value="0">Orientation</option>
           <option value="1">Day 1</option>
@@ -81,12 +84,11 @@ View your personalized CONNECT Schedule.
       </div>
       <div class="col-1"></div>
       <div class="col-6">
+        <label class="small mb-1">Select a Time Zone</label>
         <select name="timezone" id="timezone" class="form-control"></select>
       </div>
     </div>
-  </div>
-  <div class="card-body">
-
+    <br/>
     <p><strong>This schedule has been customized for you (#{{session.get("user")}}). <br/><i>Please do not share or publish in any way, shape, or form.</i></p></strong>
 
     <div class="table-responsive">
