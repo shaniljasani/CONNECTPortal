@@ -237,11 +237,11 @@ def schedules():
                     user_data["family"] = '10'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
-                user_data["family"] = record['fields']['Family'][0] if ('Family' in record['fields']) else 'no'
+                # user_data["familyName"] = record['fields']['Family'][0] if ('Family' in record['fields']) else 'no'
                 if(user_data["stagger"] == 'C'):
                     user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
 
-        print(user_data["family"])
+        # print(user_data["family"])
         orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
         camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
 
@@ -330,7 +330,7 @@ def schedules():
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
         # get family for jodav notice 
-        farsi = ( user_data['family'] == 'recJPqH4Jh3tMi3DN' )
+        farsi = ( user_data["stagger"] == 'C' )
 
         return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, farsi=farsi)
     
