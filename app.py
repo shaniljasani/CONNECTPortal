@@ -111,7 +111,7 @@ def facilitators():
     return redirect("/")
 
 @app.route('/staff')
-def facilitators():
+def staff():
     user_id = session.get("user", None)
     timestamp = datetime.now(tz=utc)
 
