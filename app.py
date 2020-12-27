@@ -231,6 +231,7 @@ def schedules():
                     user_data["familyLink2"] = record['fields']['JodavCombinedLink'][0] if ('JodavCombinedLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["cabinLink"] = record['fields']['CabinLink'][0] if ('CabinLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
+                user_data["ecoLink"] = record['fields']['EcoZoomLink'][0] if ('EcoZoomLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["family"] = record['fields']['FamName'][0][1] if ('Family' in record['fields']) else 'Visit HelpDesk'
                 if(user_data["stagger"] == 'C'):
                     user_data["family"] = '10'
@@ -250,7 +251,10 @@ def schedules():
         formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1,{{FacOnly}}!=1)'
         if(user_id<3000):
             formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1)'
-            startdate = startdate + timedelta(hours=-1)
+            if(user_data["stagger"]=='C'):
+                startdate = startdate + timedelta(minutes=-45)
+            else:
+                startdate = startdate + timedelta(hours=-1)
 
         #get sch data using ppant stagger
         schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
@@ -262,9 +266,8 @@ def schedules():
         #camp start date for stagger and duration tracker
         durTracker = datetime.now()
 
-        #stagger c counter for cabin opening links, c=cabin, f=family
+        #stagger c counter for cabin opening links
         c_count = 1
-        f_count = 1
 
         #day tracker 
         day = -1
@@ -302,19 +305,16 @@ def schedules():
                     c_count += 1
             elif 'transition' in str.lower(location):
                 schData[3] = 'Transition'
+            elif 'combinedfamily' in str.lower(location):
+                    schData[3] = htmlanchor(user_data["familyLink2"])
             elif 'family' in str.lower(location):
-                if user_data["stagger"] != 'C':
                     schData[3] = htmlanchor(user_data["familyLink"])
-                else:
-                    if f_count%3 != 2:
-                        schData[3] = htmlanchor(user_data["familyLink"])
-                    else:
-                        schData[3] = htmlanchor(user_data["familyLink2"])
-                    f_count += 1
             elif 'break' in str.lower(location):
                 schData[3] = htmlanchor('lounge')
             elif 'create' in str.lower(location):
                 schData[3] = htmlanchor(user_data["createLink"])
+            elif 'eco' in str.lower(location):
+                schData[3] = htmlanchor(user_data["ecoLink"])
             elif 'briefing' in str.lower(location):
                 schData[3] = htmlanchor("https://campconnect-co.zoom.us/my/connectfcd" + user_data["family"])
             elif 'WebinarLink' in schInfo[len(schArr)]['fields']:
