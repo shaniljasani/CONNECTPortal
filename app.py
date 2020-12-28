@@ -211,6 +211,8 @@ def schedules():
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
                 if(user_data["stagger"] == 'C'):
                     user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
+                    user_data["timezone"] = 'AFG'
+                    user_data["offset"] = 165
 
         print(user_data["family"])
         orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
@@ -305,6 +307,8 @@ def schedules():
         #get camp day #, default to 1
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
+        if (user_data["stagger"]=='C'):
+            region = 'Asia/Kabul'
 
         return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region)
     
