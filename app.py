@@ -212,7 +212,7 @@ def schedules():
                 if(user_data["stagger"] == 'C'):
                     user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
                     user_data["timezone"] = 'AFG'
-                    user_data["offset"] = 165
+                    user_data["offset"] = 270
 
         print(user_data["family"])
         orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
