@@ -4,7 +4,7 @@
 {% block body %}
     {{ super() }}
 
-    
+    <script src="static/vendor/confetti.js/confetti.min.js"></script>
     <script>confetti.start(4000, 200);</script>
 
     <!-- Page Heading -->
@@ -29,8 +29,4 @@
     </div>
 
     
-{% endblock %}
-
-{% block script %}
-    <script src="static/vendor/confetti.js/confetti.min.js"></script>
 {% endblock %}
