@@ -254,7 +254,7 @@ def schedules():
         if(user_id<3000):
             formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1)'
             if(user_data["stagger"]=='C'):
-                startdate = startdate + timedelta(minutes=-45)
+                startdate = startdate + timedelta(minutes=-30)
             else:
                 startdate = startdate + timedelta(hours=-1)
 
