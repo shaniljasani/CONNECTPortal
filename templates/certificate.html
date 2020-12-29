@@ -4,47 +4,33 @@
 {% block body %}
     {{ super() }}
 
+    
+    <script>confetti.start(4000, 200);</script>
+
     <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Certificates</h1>
-    <!-- <p class="mb-4">View your CONNECT details on the Profile page.</p> -->
+    <h1 class="h3 mb-2 text-gray-800">CONNECT Certificates</h1>
+    <p class="mb-4">You did it! Mark your completion of CONNECT with this certificate.</p>
 
     <div class="card mb-4">
-        <div class="card-header">Certificate for {{ name }} (#{{ session.get("user") }})</div>
+        <div class="card-header">Certificate for <strong>{{ name }}</strong> (<span id="id">#{{ session.get("user") }}</span>)</div>
         <div class="card-body">
 
-            <form>
-                <fieldset disabled />
-               
-                    <!-- Form Group (username)-->
-                    <div class="form-group">
-                        <label class="small mb-1">{{ family }}</label>
-                        <input class="form-control" type="text" placeholder="data" value="{{ name }}">
-                    </div>
-               
-                
-                <!-- Form Group (email address)-->
-                <!-- <div class="form-group">
-                    <label class="small mb-1" for="inputEmailAddress">Email address</label>
-                    <input class="form-control" id="inputEmailAddress" type="email" placeholder="Enter your email address" value="name@example.com">
-                </div> -->
-                <!-- Form Row-->
-                <!-- <div class="form-row"> -->
-                    <!-- Form Group (phone number)-->
-                    <!-- <div class="form-group col-md-6">
-                        <label class="small mb-1" for="inputPhone">Phone number</label>
-                        <input class="form-control" id="inputPhone" type="tel" placeholder="Enter your phone number" value="555-123-4567">
-                    </div> -->
-                    <!-- Form Group (birthday)-->
-                    <!-- <div class="form-group col-md-6">
-                        <label class="small mb-1" for="inputBirthday">Birthday</label>
-                        <input class="form-control" id="inputBirthday" type="text" name="birthday" placeholder="Enter your birthday" value="06/10/1988">
-                    </div>
-                </div> -->
-                
-                
-            </form>
+            <a href="https://campconnect.co/certificates/pdf-data/certificate-{{ session.get('user') }}.pdf" class="btn text-white btn-primary shadow"><i
+                class="fas fa-download text-white-50"></i> Download Certificate as a PDF</a>
+            <br/>
+		    <br/>
+			<!-- <a href="https://campconnect.co/certificates/pdf-data/certificate-{{ session.get('user') }}.pdf"> Click here to download your certificate. </a>	 -->
+		    <iframe src="https://docs.google.com/gview?url=https://campconnect.co/certificates/pdf-data/certificate-{{ session.get('user') }}&embedded=true" style="width:100%; height:500px;" frameborder="0"></iframe>
+				    
+            
+
+            
         </div>
     </div>
 
     
+{% endblock %}
+
+{% block script %}
+    <script src="static/vendor/confetti.js/confetti.min.js"></script>
 {% endblock %}
