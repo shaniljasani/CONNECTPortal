@@ -230,12 +230,10 @@ def certificate():
         else:
             user_info = Airtable(BASE_ID, 'Participant', API_KEY).search("ID", user_id)[0]["fields"]
             name = user_info["Participant Name"][0]
-        
-        family = Airtable(BASE_ID, 'Family', API_KEY).get(user_info["Family"][0])["fields"]["Name"]
 
         log_user_activity(user_id, "/certificate", timestamp)
 
-        return render_template("certificate.html", name=name, family=family)
+        return render_template("certificate.html", name=name)
 
     return redirect(url_for("login"))
 
