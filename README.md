@@ -1,17 +1,31 @@
-# Project: Camp CONNECT Portal
-testing
-## Development
+# CONNECT Portal
 
-### System Requirements
+The CONNECT Portal is a central resource platform for the CONNECT Program hosted by [Global Encounters](https://the.ismaili/global-encounters). Participants and Facilitators can:
+
+* See their schedules 
+* View Resources
+* Get Support
+
+[View the Portal Guide](https://link.campconnect.co/portalguide)
+
+## Milestones:
+* Single Sign-On using Camp ID and Passcode
+* Custom Participant & Facilitator Schedule Page
+   * (data from Airtable)
+* Dynamic Resources Page
+* Support Helpdesk Integration with Freshdesk
+
+## System Requirements
 * Linux, MacOS, or Windows
 * Python 3.3 or greater
+
+## Installation & Usage
 
 ### Step 1: Clone and Change Directory
 
 ```
 git clone https://github.com/shaniljasani/CONNECTPortal.git
 ```
-
 ```
 cd CONNECTPortal
 ```
@@ -48,48 +62,9 @@ The `/scripts` folder provides Python scripts that may be useful to perform Airt
 
 * `populate_auth_table.py`: takes data from Facilitators and Participants tables and creates authentication for users that don't already have one
 
-## Context/Current situation
+## Attributions
+Special thanks to [@AtaGowani](https://github.com/AtaGowani) and [@SGhulamani](https://github.com/sghulamani) for their contributions to this project.  
+Theme: [SB Admin 2](https://startbootstrap.com/theme/sb-admin-2)
 
-CONNECT, a virtual camp that was brought directly to the homes of 1,075 participants during a 10-day period this July, was an effort to bring the global youth together through creativity and exploration. 
-
-Due to the success of the July camp, GE will be hosting another virtual camp in December (26th - 30th). 
-
-In the run-up to the July camp, the technology team built a portal to service the needs of the virtual camp model.
-
-The Camp CONNECT Portal is a central resource for participants, facilitators, and staff to access resources, support, and personalized schedules. 
-
-## Scope:
-
-In July, the portal allowed participants and facilitators to use their camp ID to login to the portal and access the above information. 
-
-
-Upon login, participants and facilitators had access to a PDF-generated schedule. 
-
-
-For the December camp, we are looking to integrate their personalised schedule directly into their schedule webpage (once they login). This will allow for an integrated + smoother experience. 
-
-
-This will also be extended to staff members.
-
-## Milestones:
-* Single Sign-On using Camp ID and Password
-* Custom Participant & Facilitator Schedule Page
-   * (data exists in Google Sheets & Airtable)
-
-## Preferred skillsets:
-* HTML/CSS/Bootstrap
-* Python with Flask, or similar Web Development Framework
-* SQL 
-
-## Time Duration:
-Assuming a team of three (with varying levels of experience), we estimate this to take a maximum of 15 hours
-
-## Deadline:
-5th December 2020
-
-## Previous Portal Screenshots and Previous Schedule:
-https://campconnect.co/moodle/pluginfile.php/82/mod_resource/content/3/Portal%20Quick%20Start.pdf
-
-https://drive.google.com/file/d/1zvYYK8m-xPbFTCb9Z3B9Vq4scgjlkXru/view?usp=sharing
-
-https://campconnect.co/schedules/pdf-data/3/2055-3.pdf
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
