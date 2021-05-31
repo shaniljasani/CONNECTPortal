@@ -25,14 +25,14 @@
                 {% elif record['fields']['Type']=='Slides' %}
                     {% set color = 'warning' %}
                 {% endif %}
-                {% if loop.index%2==0 %}
+                {% if loop.index % 2 == 0 %}
                 <div class="col-6">
                     <div class="card mb-4 border-left-{{color}} shadow py-2">
                         <div class="card-header" style="background-color:inherit">
                             <h6 class="m-0 font-weight-bold text-{{color}}"><a style="color: inherit" href="{{ record['fields']['Link'] }}" target="_blank">{{ record['fields']['Name'] }}</a></h6>
                         </div>
                         <div class="card-body">
-                            <p>{{ record['fields']['Description'] }}</p>
+                            <p style="min-height: 5vh;">{{ record['fields']['Description'] }}</p>
 
                             <a href="{{ record['fields']['Link'] }}" class="btn btn-{{color}} btn-icon-split">
                                 <span class="icon text-white-50">
@@ -52,7 +52,7 @@
                             <h6 class="m-0 font-weight-bold text-{{color}}"><a style="color: inherit" href="{{ record['fields']['Link'] }}" target="_blank">{{ record['fields']['Name'] }}</a></h6>
                         </div>
                         <div class="card-body">
-                            <p>{{ record['fields']['Description'] }}</p>
+                            <p style="min-height: 5vh;">{{ record['fields']['Description'] }}</p>
 
                             <a href="{{ record['fields']['Link'] }}" class="btn btn-{{color}} btn-icon-split">
                                 <span class="icon text-white-50">
