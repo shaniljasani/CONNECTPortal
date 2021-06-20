@@ -19,6 +19,8 @@ app.secret_key = os.getenv("APP_SECRET")
 
 API_KEY = os.getenv("AIRTABLE_API_KEY")
 BASE_ID = os.getenv("BASE_ID")
+NEW_API_KEY = os.getenv("NEW_AIRTABLE_API_KEY")
+NEW_BASE_ID = os.getenv("NEW_BASE_ID")
 G_ANALYTICS = os.getenv("G_ANALYTICS")
 
 @app.context_processor
@@ -26,7 +28,7 @@ def inject_analytics():
     return dict(analytics_id=G_ANALYTICS)
 
 def verify(user, pw):
-    airtable = Airtable(BASE_ID, 'Authentication', API_KEY)
+    airtable = Airtable(NEW_BASE_ID, 'Authentication', NEW_API_KEY)
     user_data = airtable.search("ID", user)
 
     if user_data:
@@ -35,6 +37,10 @@ def verify(user, pw):
             return user_data[0]["fields"]["ID"]
     
     return False
+
+def get_camp(uid):
+    user_data = Airtable(NEW_BASE_ID, 'Participants', NEW_API_KEY).get_all(fields=['Theme'], formula=f"{{ID}}={uid}")
+    session["theme"] = user_data[0]["fields"]["Theme"]
 
 def log_user_activity(uid, endpoint, timestamp):
     timestrfmt = "%B %d, %Y %I:%M:%S %p %Z"
@@ -89,7 +95,7 @@ def index():
     timestamp = datetime.now(tz=utc)
 
     if user_id:
-        log_user_activity(user_id, "/", timestamp)
+        #log_user_activity(user_id, "/", timestamp)
         return render_template("index.html")
     
     return redirect(url_for("login"))
@@ -98,11 +104,10 @@ def index():
 def support():
     user_id = session.get("user", None)
     timestamp = datetime.now(tz=utc)
-
-    if user_id:
-        log_user_activity(user_id, "/support", timestamp)
-    else:
-        log_user_activity(-1, "/support", timestamp)
+    # if user_id:
+    #     log_user_activity(user_id, "/support", timestamp)
+    # else:
+    #     log_user_activity(-1, "/support", timestamp)
     
     return render_template("support.html")
 
@@ -114,7 +119,7 @@ def facilitators():
     if user_id:
         if user_id < 1010:
             resources = Airtable(BASE_ID, 'Facilitator Resources', API_KEY).get_iter(sort=['Order'])
-            log_user_activity(user_id, "/facilitators", timestamp)
+            #log_user_activity(user_id, "/facilitators", timestamp)
 
             return render_template("facilitators.html", resources=resources)
         else:
@@ -129,7 +134,7 @@ def resources():
 
     if user_id:
         resources = Airtable(BASE_ID, 'Resources', API_KEY).get_iter(sort=['Order'])
-        log_user_activity(user_id, "/resources", timestamp)
+        #log_user_activity(user_id, "/resources", timestamp)
 
         return render_template("resources.html", resources=resources)
 
@@ -170,7 +175,7 @@ def profile():
                 "Eco Workshop Facilitator(s)": eco_info.get(user_info["EcoWorkshop"][0])["fields"]["Fac Name"]
             }
 
-        log_user_activity(user_id, "/profile", timestamp)
+        #log_user_activity(user_id, "/profile", timestamp)
 
         return render_template("profile.html", user_data=data)
 
@@ -190,8 +195,9 @@ def login():
         uid = verify(user, pw)
 
         if uid:
-            log_user_activity(uid, "/login", timestamp)
+            #log_user_activity(uid, "/login", timestamp)
             session["user"] = uid
+            get_camp(uid)
             return redirect(url_for("index"))
 
         data["invalid"] = True
@@ -210,8 +216,8 @@ def logout():
     session.pop("offset", None)
     user_id = session.pop("user", None)
 
-    if user_id:
-        log_user_activity(user_id, "/logout", timestamp)
+    # if user_id:
+        #log_user_activity(user_id, "/logout", timestamp)
 
     return(redirect(url_for("login")))
 
@@ -231,7 +237,7 @@ def certificate():
             user_info = Airtable(BASE_ID, 'Participant', API_KEY).search("ID", user_id)[0]["fields"]
             name = user_info["Participant Name"][0]
 
-        log_user_activity(user_id, "/certificate", timestamp)
+        #log_user_activity(user_id, "/certificate", timestamp)
 
         return render_template("certificate.html", name=name)
 
@@ -252,7 +258,7 @@ def schedules():
     timestamp = datetime.now(tz=utc)
 
     if user_id:
-        log_user_activity(user_id, "/schedules", timestamp)
+        #log_user_activity(user_id, "/schedules", timestamp)
         
         user_tbl = 'Facilitator'
         if(user_id>2999):
