@@ -292,7 +292,8 @@ def schedules():
 
         #get sch view
         schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
-        schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
+        #schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
+        schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=f'Build: {theme}')
 
         #list that will store organize the schData objects for the table
         schArr = []
@@ -321,23 +322,19 @@ def schedules():
             schData[1] = datetime.strftime(schData[1], "%I:%M %p") + ' - ' + datetime.strftime(durTracker, "%I:%M %p") + ' ' + user_data["timezone"]
 
             #Activity
-            type = schInfo[len(schArr)]['fields']['ActivityType']
+            type = schInfo[len(schArr)]['fields']['ActivityType'] if schInfo[len(schArr)]['fields']['ActivityType'] else 'error'
             schData[2] = schInfo[len(schArr)]['fields']['Description'] if 'Description' in schInfo[len(schArr)]['fields'] else type
 
             #Zoom Link
-            if 'cabin' in str.lower(type):
+            if type in ['Opening Cabin', 'Check-In']:
                 schData[3] = htmlanchor(user_data["cabinLink"])
-            elif 'transition' in str.lower(type):
-                schData[3] = 'Transition'
-            elif 'family' in str.lower(type):
-                    schData[3] = htmlanchor(user_data["familyLink"])
-            elif 'break' in str.lower(type):
+            elif type == 'Explore':
+                schData[3] = htmlanchor(user_data["familyLink"])
+            elif type == 'Break / Global Lounge':
                 schData[3] = htmlanchor('lounge')
-            elif 'create' in str.lower(type):
+            elif type == 'create':
                 schData[3] = htmlanchor(user_data["createLink"])
-            elif 'eco' in str.lower(type):
-                schData[3] = htmlanchor(user_data["ecoLink"])
-            elif 'briefing' in str.lower(type):
+            elif type == 'briefing':
                 schData[3] = htmlanchor("https://campconnect-co.zoom.us/my/connectfcd" + user_data["family"])
             elif 'WebinarLink' in schInfo[len(schArr)]['fields']:
                 schData[3] = htmlanchor(schInfo[len(schArr)]['fields']['WebinarLink'])
