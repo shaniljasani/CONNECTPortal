@@ -268,9 +268,9 @@ def schedules():
         user_data = {}
         for page in Airtable(NEW_BASE_ID, user_tbl, NEW_API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
             for record in page:
-                user_data["familyLink"] = record['fields']['FamilyLink'][0] if ('FamilyLink' in record['fields']) else 'Visit HelpDesk'
-                user_data["cabinLink"] = record['fields']['CabinLink'][0] if ('CabinLink' in record['fields']) else 'Visit HelpDesk'
-                user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
+                user_data["familyLink"] = record['fields']['Family Link'][0] if ('Family Link' in record['fields']) else 'Visit HelpDesk'
+                user_data["cabinLink"] = record['fields']['Cabin Link'][0] if ('Cabin Link' in record['fields']) else 'Visit HelpDesk'
+                user_data["createLink"] = record['fields']['Create Link'][0] if ('Create Link' in record['fields']) else 'Visit HelpDesk'
                 user_data["ecoLink"] = record['fields']['EcoZoomLink'][0] if ('EcoZoomLink' in record['fields']) else 'Visit HelpDesk'
                 user_data["family"] = record['fields']['Family'] if ('Family' in record['fields']) else 'Visit HelpDesk'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
@@ -293,7 +293,8 @@ def schedules():
         #get sch view
         schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
         #schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
-        schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=f'Build: {theme}')
+        #schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=f'Build: {theme}')
+        schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=f'AC')
 
         #list that will store organize the schData objects for the table
         schArr = []
@@ -322,17 +323,17 @@ def schedules():
             schData[1] = datetime.strftime(schData[1], "%I:%M %p") + ' - ' + datetime.strftime(durTracker, "%I:%M %p") + ' ' + user_data["timezone"]
 
             #Activity
-            type = schInfo[len(schArr)]['fields']['ActivityType'] if schInfo[len(schArr)]['fields']['ActivityType'] else 'error'
+            type = schInfo[len(schArr)]['fields']['LinkType'] if schInfo[len(schArr)]['fields']['LinkType'] else 'error'
             schData[2] = schInfo[len(schArr)]['fields']['Description'] if 'Description' in schInfo[len(schArr)]['fields'] else type
 
             #Zoom Link
-            if type in ['Opening Cabin', 'Check-In']:
+            if type == 'Cabin':
                 schData[3] = htmlanchor(user_data["cabinLink"])
-            elif type == 'Explore':
+            elif type == 'Family':
                 schData[3] = htmlanchor(user_data["familyLink"])
-            elif type == 'Break / Global Lounge':
+            elif type == 'Lounge':
                 schData[3] = htmlanchor('lounge')
-            elif type == 'create':
+            elif type == 'Create':
                 schData[3] = htmlanchor(user_data["createLink"])
             elif type == 'briefing':
                 schData[3] = htmlanchor("https://campconnect-co.zoom.us/my/connectfcd" + user_data["family"])
@@ -345,6 +346,7 @@ def schedules():
             schArr.append(schData)
 
         #get camp day #, default to 1
+        #fix this
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
