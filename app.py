@@ -19,6 +19,8 @@ app.secret_key = os.getenv("APP_SECRET")
 
 API_KEY = os.getenv("AIRTABLE_API_KEY")
 BASE_ID = os.getenv("BASE_ID")
+NEW_API_KEY = os.getenv("NEW_AIRTABLE_API_KEY")
+NEW_BASE_ID = os.getenv("NEW_BASE_ID")
 G_ANALYTICS = os.getenv("G_ANALYTICS")
 
 @app.context_processor
@@ -26,7 +28,7 @@ def inject_analytics():
     return dict(analytics_id=G_ANALYTICS)
 
 def verify(user, pw):
-    airtable = Airtable(BASE_ID, 'Authentication', API_KEY)
+    airtable = Airtable(NEW_BASE_ID, 'Authentication', NEW_API_KEY)
     user_data = airtable.search("ID", user)
 
     if user_data:
@@ -35,6 +37,10 @@ def verify(user, pw):
             return user_data[0]["fields"]["ID"]
     
     return False
+
+def get_camp(uid):
+    user_data = Airtable(NEW_BASE_ID, 'Participants', NEW_API_KEY).get_all(fields=['Theme'], formula=f"{{ID}}={uid}")
+    session["theme"] = user_data[0]["fields"]["Theme"]
 
 def log_user_activity(uid, endpoint, timestamp):
     timestrfmt = "%B %d, %Y %I:%M:%S %p %Z"
@@ -89,7 +95,7 @@ def index():
     timestamp = datetime.now(tz=utc)
 
     if user_id:
-        log_user_activity(user_id, "/", timestamp)
+        #log_user_activity(user_id, "/", timestamp)
         return render_template("index.html")
     
     return redirect(url_for("login"))
@@ -98,11 +104,10 @@ def index():
 def support():
     user_id = session.get("user", None)
     timestamp = datetime.now(tz=utc)
-
-    if user_id:
-        log_user_activity(user_id, "/support", timestamp)
-    else:
-        log_user_activity(-1, "/support", timestamp)
+    # if user_id:
+    #     log_user_activity(user_id, "/support", timestamp)
+    # else:
+    #     log_user_activity(-1, "/support", timestamp)
     
     return render_template("support.html")
 
@@ -114,7 +119,7 @@ def facilitators():
     if user_id:
         if user_id < 1010:
             resources = Airtable(BASE_ID, 'Facilitator Resources', API_KEY).get_iter(sort=['Order'])
-            log_user_activity(user_id, "/facilitators", timestamp)
+            #log_user_activity(user_id, "/facilitators", timestamp)
 
             return render_template("facilitators.html", resources=resources)
         else:
@@ -129,7 +134,7 @@ def resources():
 
     if user_id:
         resources = Airtable(BASE_ID, 'Resources', API_KEY).get_iter(sort=['Order'])
-        log_user_activity(user_id, "/resources", timestamp)
+        #log_user_activity(user_id, "/resources", timestamp)
 
         return render_template("resources.html", resources=resources)
 
@@ -170,7 +175,7 @@ def profile():
                 "Eco Workshop Facilitator(s)": eco_info.get(user_info["EcoWorkshop"][0])["fields"]["Fac Name"]
             }
 
-        log_user_activity(user_id, "/profile", timestamp)
+        #log_user_activity(user_id, "/profile", timestamp)
 
         return render_template("profile.html", user_data=data)
 
@@ -190,8 +195,9 @@ def login():
         uid = verify(user, pw)
 
         if uid:
-            log_user_activity(uid, "/login", timestamp)
+            #log_user_activity(uid, "/login", timestamp)
             session["user"] = uid
+            get_camp(uid)
             return redirect(url_for("index"))
 
         data["invalid"] = True
@@ -210,8 +216,8 @@ def logout():
     session.pop("offset", None)
     user_id = session.pop("user", None)
 
-    if user_id:
-        log_user_activity(user_id, "/logout", timestamp)
+    # if user_id:
+        #log_user_activity(user_id, "/logout", timestamp)
 
     return(redirect(url_for("login")))
 
@@ -231,7 +237,7 @@ def certificate():
             user_info = Airtable(BASE_ID, 'Participant', API_KEY).search("ID", user_id)[0]["fields"]
             name = user_info["Participant Name"][0]
 
-        log_user_activity(user_id, "/certificate", timestamp)
+        #log_user_activity(user_id, "/certificate", timestamp)
 
         return render_template("certificate.html", name=name)
 
@@ -249,63 +255,52 @@ def htmlanchor(link):
 @app.route('/schedules', methods=['GET', 'POST'])
 def schedules():
     user_id = session.get("user", None)
+    theme = session.get("theme", None)
     timestamp = datetime.now(tz=utc)
 
     if user_id:
-        log_user_activity(user_id, "/schedules", timestamp)
+        #log_user_activity(user_id, "/schedules", timestamp)
         
         user_tbl = 'Facilitator'
         if(user_id>2999):
-            user_tbl = 'Participant'
+            user_tbl = 'Participants'
 
         user_data = {}
-        for page in Airtable(BASE_ID, user_tbl, API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
+        for page in Airtable(NEW_BASE_ID, user_tbl, NEW_API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
             for record in page:
-                user_data["stagger"] = record['fields']['Stagger'][0]
-                user_data["familyLink"] = record['fields']['FamilyLink'][0] if ('FamilyLink' in record['fields']) else 'Visit HelpDesk'
-                if(user_data["stagger"] == 'C'):
-                    user_data["familyLink2"] = record['fields']['JodavCombinedLink'][0] if ('JodavCombinedLink' in record['fields']) else 'Visit HelpDesk'
-                user_data["cabinLink"] = record['fields']['CabinLink'][0] if ('CabinLink' in record['fields']) else 'Visit HelpDesk'
-                user_data["createLink"] = record['fields']['CreateLink'][0] if ('CreateLink' in record['fields']) else 'Visit HelpDesk'
+                user_data["familyLink"] = record['fields']['Family Link'][0] if ('Family Link' in record['fields']) else 'Visit HelpDesk'
+                user_data["cabinLink"] = record['fields']['Cabin Link'][0] if ('Cabin Link' in record['fields']) else 'Visit HelpDesk'
+                user_data["createLink"] = record['fields']['Create Link'][0] if ('Create Link' in record['fields']) else 'Visit HelpDesk'
                 user_data["ecoLink"] = record['fields']['EcoZoomLink'][0] if ('EcoZoomLink' in record['fields']) else 'Visit HelpDesk'
-                user_data["family"] = record['fields']['FamName'][0][1] if ('Family' in record['fields']) else 'Visit HelpDesk'
-                if(user_data["stagger"] == 'C'):
-                    user_data["family"] = '10'
+                user_data["family"] = record['fields']['Family'] if ('Family' in record['fields']) else 'Visit HelpDesk'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
                 # user_data["familyName"] = record['fields']['Family'][0] if ('Family' in record['fields']) else 'no'
-                if(user_data["stagger"] == 'C'):
-                    user_data["cabinLink2"] = record['fields']['JodavCabinLink'][0] if ('JodavCabinLink' in record['fields']) else 'Visit HelpDesk'
-                    user_data["timezone"] = 'AFG'
-                    user_data["offset"] = 270
 
-        # print(user_data["family"])
-        orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
-        camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
+        #orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
+        orientation_day = os.getenv("ORIENTATION_START_DATETIME")
+        #camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
+        camp_start = os.getenv("CAMP_START_DATETIME")
 
         orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
         startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
 
-        formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1,{{FacOnly}}!=1)'
+        formula = f'AND({{Hidden}}!=1,{{FacOnly}}!=1)'
         if(user_id<3000):
-            formula = f'AND({{Stagger}}=\"{user_data["stagger"]}\",{{Hidden}}!=1)'
-            if(user_data["stagger"]=='C'):
-                startdate = startdate + timedelta(minutes=-30)
-            else:
-                startdate = startdate + timedelta(hours=-1)
+            formula = f'{{Hidden}}!=1'
+            startdate = startdate + timedelta(hours=-1)
 
-        #get sch data using ppant stagger
+        #get sch view
         schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
-        schInfo = Airtable(BASE_ID, schedule_tbl, API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
+        #schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
+        #schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=f'Build: {theme}')
+        schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=f'AC')
 
         #list that will store organize the schData objects for the table
         schArr = []
 
-        #camp start date for stagger and duration tracker
+        #duration tracker
         durTracker = datetime.now()
-
-        #stagger c counter for cabin opening links
-        c_count = 1
 
         #day tracker 
         day = -1
@@ -328,32 +323,19 @@ def schedules():
             schData[1] = datetime.strftime(schData[1], "%I:%M %p") + ' - ' + datetime.strftime(durTracker, "%I:%M %p") + ' ' + user_data["timezone"]
 
             #Activity
-            location = schInfo[len(schArr)]['fields']['ActivityType']
-            schData[2] = schInfo[len(schArr)]['fields']['Description'] if 'Description' in schInfo[len(schArr)]['fields'] else location
+            type = schInfo[len(schArr)]['fields']['LinkType'] if schInfo[len(schArr)]['fields']['LinkType'] else 'error'
+            schData[2] = schInfo[len(schArr)]['fields']['Description'] if 'Description' in schInfo[len(schArr)]['fields'] else type
 
             #Zoom Link
-            if 'cabin' in str.lower(location):
-                if user_data["stagger"] != 'C':
-                    schData[3] = htmlanchor(user_data["cabinLink"])
-                else:
-                    if c_count%3 != 0:
-                        schData[3] = htmlanchor(user_data["cabinLink2"])
-                    else:
-                        schData[3] = htmlanchor(user_data["cabinLink"])
-                    c_count += 1
-            elif 'transition' in str.lower(location):
-                schData[3] = 'Transition'
-            elif 'combinedfamily' in str.lower(location):
-                    schData[3] = htmlanchor(user_data["familyLink2"])
-            elif 'family' in str.lower(location):
-                    schData[3] = htmlanchor(user_data["familyLink"])
-            elif 'break' in str.lower(location):
+            if type == 'Cabin':
+                schData[3] = htmlanchor(user_data["cabinLink"])
+            elif type == 'Family':
+                schData[3] = htmlanchor(user_data["familyLink"])
+            elif type == 'Lounge':
                 schData[3] = htmlanchor('lounge')
-            elif 'create' in str.lower(location):
+            elif type == 'Create':
                 schData[3] = htmlanchor(user_data["createLink"])
-            elif 'eco' in str.lower(location):
-                schData[3] = htmlanchor(user_data["ecoLink"])
-            elif 'briefing' in str.lower(location):
+            elif type == 'briefing':
                 schData[3] = htmlanchor("https://campconnect-co.zoom.us/my/connectfcd" + user_data["family"])
             elif 'WebinarLink' in schInfo[len(schArr)]['fields']:
                 schData[3] = htmlanchor(schInfo[len(schArr)]['fields']['WebinarLink'])
@@ -364,15 +346,11 @@ def schedules():
             schArr.append(schData)
 
         #get camp day #, default to 1
+        #fix this
         campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
-        if (user_data["stagger"]=='C'):
-            region = 'Asia/Kabul'
 
-        # get family for jodav notice 
-        farsi = ( user_data["stagger"] == 'C' )
-
-        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, farsi=farsi)
+        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region)
     
     return redirect(url_for("login"))
 
