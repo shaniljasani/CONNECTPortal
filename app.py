@@ -28,7 +28,10 @@ def inject_analytics():
     return dict(analytics_id=G_ANALYTICS)
 
 def verify(user, pw):
-    airtable = Airtable(NEW_BASE_ID, 'Authentication', NEW_API_KEY)
+    user_tbl = 'Facilitators & Staff'
+    if(int(user)>3999 and int(user)<9000):
+        user_tbl = 'Participants'
+    airtable = Airtable(NEW_BASE_ID, user_tbl, NEW_API_KEY)
     user_data = airtable.search("ID", user)
 
     if user_data:
@@ -39,31 +42,35 @@ def verify(user, pw):
     return False
 
 def get_camp(uid):
-    user_data = Airtable(NEW_BASE_ID, 'Participants', NEW_API_KEY).get_all(fields=['Theme'], formula=f"{{ID}}={uid}")
+    user_data = Airtable(NEW_BASE_ID, 'Participants', NEW_API_KEY).get_all(fields=['Theme', 'Family'], formula=f"{{ID}}={uid}")
     session["theme"] = user_data[0]["fields"]["Theme"]
+    if 'PT1' in user_data[0]["fields"]["Family"]:
+        session["theme"] = 'PT1 ET'
+    if 'PT2' in user_data[0]["fields"]["Family"]:
+        session["theme"] = 'PT2 HW'
 
-def log_user_activity(uid, endpoint, timestamp):
-    timestrfmt = "%B %d, %Y %I:%M:%S %p %Z"
-    log = {
-        "uid": uid,
-        "endpoint": endpoint,
-        "timestamp": timestamp.strftime(timestrfmt)
-    }
+# def log_user_activity(uid, endpoint, timestamp):
+#     timestrfmt = "%B %d, %Y %I:%M:%S %p %Z"
+#     log = {
+#         "uid": uid,
+#         "endpoint": endpoint,
+#         "timestamp": timestamp.strftime(timestrfmt)
+#     }
 
-    log_table = Airtable(BASE_ID, 'Activity Logs', API_KEY)
-    log_table.insert(log)
+#     log_table = Airtable(BASE_ID, 'Activity Logs', API_KEY)
+#     log_table.insert(log)
 
-def log_error(uid, endpoint, timestamp, desc):
-    timestrfmt = "%B %d, %Y %I:%M:%S %p %Z"
-    err_log = {
-        "uid": uid,
-        "endpoint": endpoint,
-        "timestamp": timestamp.strftime(timestrfmt),
-        "description": desc
-    }
+# def log_error(uid, endpoint, timestamp, desc):
+#     timestrfmt = "%B %d, %Y %I:%M:%S %p %Z"
+#     err_log = {
+#         "uid": uid,
+#         "endpoint": endpoint,
+#         "timestamp": timestamp.strftime(timestrfmt),
+#         "description": desc
+#     }
 
-    err_log_table = Airtable(BASE_ID, 'Error Logs', API_KEY)
-    err_log_table.insert(err_log)
+#     err_log_table = Airtable(BASE_ID, 'Error Logs', API_KEY)
+#     err_log_table.insert(err_log)
 
 @app.route('/github_webhook', methods=['POST'])
 def webhook():
@@ -261,41 +268,42 @@ def schedules():
     if user_id:
         #log_user_activity(user_id, "/schedules", timestamp)
         
-        user_tbl = 'Facilitator'
-        if(user_id>2999):
+        user_tbl = 'Facilitators & Staff'
+        if(user_id>3999 and user_id<9000):
             user_tbl = 'Participants'
 
         user_data = {}
         for page in Airtable(NEW_BASE_ID, user_tbl, NEW_API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
             for record in page:
-                user_data["familyLink"] = record['fields']['Family Link'][0] if ('Family Link' in record['fields']) else 'Visit HelpDesk'
-                user_data["cabinLink"] = record['fields']['Cabin Link'][0] if ('Cabin Link' in record['fields']) else 'Visit HelpDesk'
-                user_data["createLink"] = record['fields']['Create Link'][0] if ('Create Link' in record['fields']) else 'Visit HelpDesk'
-                user_data["ecoLink"] = record['fields']['EcoZoomLink'][0] if ('EcoZoomLink' in record['fields']) else 'Visit HelpDesk'
+                user_data["familyLink"] = record['fields']['Explore ZoomURL'][0] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                user_data["cabinLink"] = record['fields']['Cabin ZoomURL'][0] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                user_data["createLink"] = record['fields']['Create ZoomURL'][0] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
                 user_data["family"] = record['fields']['Family'] if ('Family' in record['fields']) else 'Visit HelpDesk'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
                 # user_data["familyName"] = record['fields']['Family'][0] if ('Family' in record['fields']) else 'no'
 
         #orientation_day = os.getenv("ORIENTATION" + user_data["stagger"] + "_START_DATETIME")
-        orientation_day = os.getenv("ORIENTATION_START_DATETIME")
+        #orientation_day = os.getenv("ORIENTATION_START_DATETIME")
         #camp_start = os.getenv("STAGGER" + user_data["stagger"] + "_START_DATETIME")
-        camp_start = os.getenv("CAMP_START_DATETIME")
+        #camp_start = os.getenv("CAMP_START_DATETIME")
 
-        orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
-        startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
-
-        formula = f'AND({{Hidden}}!=1,{{FacOnly}}!=1)'
-        if(user_id<3000):
+        formula = f'AND({{Hidden}}!=1,{{Fac Only}}!=1)'
+        if(user_id>3999 and user_id<9000):
             formula = f'{{Hidden}}!=1'
-            startdate = startdate + timedelta(hours=-1)
+            #startdate = startdate + timedelta(hours=-1)
 
         #get sch view
-        schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
+        schedule_tbl = 'Schedule: ' + theme
+        #schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
         #schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
         #schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=f'Build: {theme}')
-        schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=f'AC')
-
+        schInfo = Airtable(NEW_BASE_ID, schedule_tbl, NEW_API_KEY).get_all(view=theme)
+        
+        #orientation = datetime.strptime(orientation_day, '%Y-%m-%d %H:%M')
+        #startdate = datetime.strptime(camp_start, '%Y-%m-%d %H:%M')
+        startdate = datetime.strptime(schInfo[0]['fields']['Local Time'], '%Y-%m-%dT%H:%M:%S.000Z')
+        
         #list that will store organize the schData objects for the table
         schArr = []
 
@@ -308,14 +316,16 @@ def schedules():
             schData = {}
 
             #DateTime Ranges
-            duration = schInfo[len(schArr)]['fields']['Duration']
+            #airtable is now returning the hour for some unknown reason
+            duration = schInfo[len(schArr)]['fields']['Duration']/60
 
             if day != schInfo[len(schArr)]['fields']['Day']:
                 day = schInfo[len(schArr)]['fields']['Day']
-                if day == 0:
-                    durTracker = orientation + timedelta(minutes=user_data["offset"])
-                else:
-                    durTracker = startdate + timedelta(days=(day-1), minutes=user_data["offset"])
+                durTracker = startdate + timedelta(days=(int(day)-1), minutes=user_data["offset"])
+                # if day == 0:
+                #     durTracker = orientation + timedelta(minutes=user_data["offset"])
+                # else:
+                #     durTracker = startdate + timedelta(days=(int(day)-1), minutes=user_data["offset"])
 
             schData[1] = durTracker
             durTracker = durTracker + timedelta(minutes=duration)
@@ -323,20 +333,20 @@ def schedules():
             schData[1] = datetime.strftime(schData[1], "%I:%M %p") + ' - ' + datetime.strftime(durTracker, "%I:%M %p") + ' ' + user_data["timezone"]
 
             #Activity
-            type = schInfo[len(schArr)]['fields']['LinkType'] if schInfo[len(schArr)]['fields']['LinkType'] else 'error'
-            schData[2] = schInfo[len(schArr)]['fields']['Description'] if 'Description' in schInfo[len(schArr)]['fields'] else type
+            type = schInfo[len(schArr)]['fields']['Zoom Owner'] if 'Zoom Owner' in schInfo[len(schArr)]['fields'] else 'error'
+            schData[2] = schInfo[len(schArr)]['fields']['Module Title'] if 'Module Title' in schInfo[len(schArr)]['fields'] else type
 
             #Zoom Link
-            if type == 'Cabin':
+            if type == 'Facilitator Line':
                 schData[3] = htmlanchor(user_data["cabinLink"])
-            elif type == 'Family':
+            elif type == 'OpD Family Line':
                 schData[3] = htmlanchor(user_data["familyLink"])
-            elif type == 'Lounge':
+            elif type == 'Lounge Lines':
                 schData[3] = htmlanchor('lounge')
             elif type == 'Create':
                 schData[3] = htmlanchor(user_data["createLink"])
-            elif type == 'briefing':
-                schData[3] = htmlanchor("https://campconnect-co.zoom.us/my/connectfcd" + user_data["family"])
+            elif type == 'FCD / PD Line':
+                schData[3] = htmlanchor("https://campconnect-co.zoom.us/my/" + user_data["family"][0].lower() + 'fcd')
             elif 'WebinarLink' in schInfo[len(schArr)]['fields']:
                 schData[3] = htmlanchor(schInfo[len(schArr)]['fields']['WebinarLink'])
             else:
@@ -346,8 +356,7 @@ def schedules():
             schArr.append(schData)
 
         #get camp day #, default to 1
-        #fix this
-        campday = (datetime.utcnow().day % 25) if 0<(datetime.utcnow().day % 26)<7 else 1
+        campday = (datetime.utcnow().day % startdate.day) if 0<(datetime.utcnow().day % startdate.day)<7 else 1
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
         return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region)
@@ -370,7 +379,7 @@ def FUN_404(error):
         uid = -1
 
     time = datetime.now(tz=utc)
-    log_error(uid, request.path, time, str(error))
+    #log_error(uid, request.path, time, str(error))
     return render_template("404.html"), 404
 
 @app.errorhandler(405)
@@ -381,7 +390,7 @@ def FUN_405(error):
         uid = -1
 
     time = datetime.now(tz=utc)
-    log_error(uid, request.path, time, str(error))
+    #log_error(uid, request.path, time, str(error))
     return render_template("405.html"), 405
 
 @app.errorhandler(413)
@@ -392,7 +401,7 @@ def FUN_413(error):
         uid = -1
 
     time = datetime.now(tz=utc)
-    log_error(uid, request.path, time, str(error))
+    #log_error(uid, request.path, time, str(error))
     return render_template("413.html"), 413
 
 @app.errorhandler(500)
@@ -404,7 +413,7 @@ def FUN_500(error):
         uid = -1
 
     time = datetime.now(tz=utc)
-    log_error(uid, request.path, time, str(error))
+    #log_error(uid, request.path, time, str(error))
     return render_template("500.html"), 500    
 
 if __name__ == "__main__":
