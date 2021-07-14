@@ -272,6 +272,7 @@ def schedules():
     timestamp = datetime.now(tz=utc)
 
     # ZOOM_DOMAIN = os.getenv("ZOOM_DOMAIN")
+    
     PT1_LINK = os.getenv("PT1_LINK")
     PT2_LINK = os.getenv("PT2_LINK")
 
