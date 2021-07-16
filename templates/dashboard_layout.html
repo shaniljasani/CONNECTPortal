@@ -105,22 +105,19 @@
           <span>Get Support</span></a>
       </li>
 
-      {% if (session.get("user", None) and session.get("user", None) < 1010) %}
-            <!-- Divider -->
+      <!-- {% if (session.get("user", None) and session.get("user", None) < 1010) %}
             <hr class="sidebar-divider">
 
-            <!-- Heading -->
             <div class="sidebar-heading">
               Facilitator Portal
             </div>
             
-            <!-- Nav Item - Facilitator Resources -->
             <li class="nav-item">
               <a class="nav-link" href="/facilitators">
                 <i class="fas fa-fw fa-file"></i>
                 <span>Facilitator Resources</span></a>
             </li>
-        {% endif %}
+        {% endif %} -->
 
 
     <!-- Last Day Celebration -->
@@ -201,10 +198,10 @@
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                 <div class="dropdown-header">Logged in as: #{{ session.get("user") }}</div>
-                <a class="dropdown-item" href="/profile">
+                <!-- <a class="dropdown-item" href="/profile">
                   <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                   Profile
-                </a>
+                </a> -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                   Logout
