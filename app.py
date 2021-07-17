@@ -286,9 +286,14 @@ def schedules():
         user_data = {}
         for page in Airtable(BASE_ID, user_tbl, API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
             for record in page:
-                user_data["exploreLink"] = record['fields']['Explore ZoomURL'] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
-                user_data["cabinLink"] = record['fields']['Cabin ZoomURL'] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
-                user_data["createLink"] = record['fields']['Create ZoomURL'] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                if user_tbl == 'Participants':
+                    user_data["exploreLink"] = record['fields']['Explore ZoomURL'] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["cabinLink"] = record['fields']['Cabin ZoomURL'] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["createLink"] = record['fields']['Create ZoomURL'] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                else:
+                    user_data["exploreLink"] = record['fields']['Explore ZoomURL'][0] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["cabinLink"] = record['fields']['Cabin ZoomURL'][0] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["createLink"] = record['fields']['Create ZoomURL'][0] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
                 user_data["family"] = record['fields']['Family'] if ('Family' in record['fields']) else 'Visit HelpDesk'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value

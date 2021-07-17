@@ -16,14 +16,16 @@
         {% for page in resources %}
             {% for record in page %}
                 {% set color = '' %}
-                {% if record['fields']['Type']=='Video' %}
+                {% if record['fields']['Type']=='Blue' %}
                     {% set color = 'primary' %}
-                {% elif record['fields']['Type']=='Reading' %}
-                    {% set color = 'info' %}
-                {% elif record['fields']['Type']=='Folder' %}
+                {% elif record['fields']['Type']=='Red' %}
+                    {% set color = 'danger' %}
+                {% elif record['fields']['Type']=='Green' %}
                     {% set color = 'success' %}
-                {% elif record['fields']['Type']=='Slides' %}
+                {% elif record['fields']['Type']=='Yellow' %}
                     {% set color = 'warning' %}
+                {% elif record['fields']['Type']=='Grey' %}
+                    {% set color = 'secondary' %}
                 {% endif %}
                 {% if loop.index % 2 == 0 %}
                 <div class="col-6">
@@ -32,7 +34,9 @@
                             <h6 class="m-0 font-weight-bold text-{{color}}"><a style="color: inherit" href="{{ record['fields']['Link'] }}" target="_blank">{{ record['fields']['Name'] }}</a></h6>
                         </div>
                         <div class="card-body">
+                            {% if 'Description' in record['fields'] %}
                             <p style="min-height: 5vh;">{{ record['fields']['Description'] }}</p>
+                            {% endif %}
 
                             <a href="{{ record['fields']['URL'] }}" class="btn btn-{{color}} btn-icon-split">
                                 <span class="icon text-white-50">
@@ -52,7 +56,9 @@
                             <h6 class="m-0 font-weight-bold text-{{color}}"><a style="color: inherit" href="{{ record['fields']['Link'] }}" target="_blank">{{ record['fields']['Name'] }}</a></h6>
                         </div>
                         <div class="card-body">
+                            {% if 'Description' in record['fields'] %}
                             <p style="min-height: 5vh;">{{ record['fields']['Description'] }}</p>
+                            {% endif %}
 
                             <a href="{{ record['fields']['URL'] }}" class="btn btn-{{color}} btn-icon-split">
                                 <span class="icon text-white-50">
