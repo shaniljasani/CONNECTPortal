@@ -400,7 +400,7 @@ def schedules():
         campday = (datetime.utcnow().day % startdate.day) if 0<(datetime.utcnow().day % startdate.day)<7 else 1
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
-        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, l1 = os.getenv('L1_LINK'), l2 = os.getenv('L2_LINK'), l3 = os.getenv('L3_LINK'))
+        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region)
     
     return redirect(url_for("login"))
 
