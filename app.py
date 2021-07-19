@@ -16,6 +16,7 @@ load_dotenv(dotenv_path="./config.py")
 # set the "static" directory as the static folder
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv("APP_SECRET")
+app.url_map.strict_slashes = False
 
 API_KEY = os.getenv("AIRTABLE_API_KEY")
 BASE_ID = os.getenv("BASE_ID")
@@ -24,6 +25,12 @@ G_ANALYTICS = os.getenv("G_ANALYTICS")
 @app.context_processor
 def inject_analytics():
     return dict(analytics_id=G_ANALYTICS)
+
+@app.before_request
+def clear_trailing():
+    rp = request.path 
+    if rp != '/' and rp.endswith('/'):
+        return redirect(rp[:-1])
 
 def verify(user, pw):
     user_tbl = 'Facilitators & Staff'
