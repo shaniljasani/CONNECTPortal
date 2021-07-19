@@ -91,6 +91,7 @@ def webhook():
         return '', 400
 
 @app.route('/_post_tz/', methods=['POST'])
+@app.route('/_post_tz', methods=['POST'])
 def post_tz():    
     data = request.get_json()
 
