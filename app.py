@@ -16,6 +16,7 @@ load_dotenv(dotenv_path="./config.py")
 # set the "static" directory as the static folder
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv("APP_SECRET")
+app.url_map.strict_slashes = False
 
 API_KEY = os.getenv("AIRTABLE_API_KEY")
 BASE_ID = os.getenv("BASE_ID")
@@ -24,6 +25,12 @@ G_ANALYTICS = os.getenv("G_ANALYTICS")
 @app.context_processor
 def inject_analytics():
     return dict(analytics_id=G_ANALYTICS)
+
+@app.before_request
+def clear_trailing():
+    rp = request.path 
+    if rp != '/' and rp.endswith('/'):
+        return redirect(rp[:-1])
 
 def verify(user, pw):
     user_tbl = 'Facilitators & Staff'
@@ -84,6 +91,7 @@ def webhook():
         return '', 400
 
 @app.route('/_post_tz/', methods=['POST'])
+@app.route('/_post_tz', methods=['POST'])
 def post_tz():    
     data = request.get_json()
 
@@ -286,9 +294,16 @@ def schedules():
         user_data = {}
         for page in Airtable(BASE_ID, user_tbl, API_KEY).get_iter(formula=f"{{ID}}={user_id}"):
             for record in page:
-                user_data["exploreLink"] = record['fields']['Explore ZoomURL'] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
-                user_data["cabinLink"] = record['fields']['Cabin ZoomURL'] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
-                user_data["createLink"] = record['fields']['Create ZoomURL'] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                if user_tbl == 'Participants':
+                    user_data["exploreLink"] = record['fields']['Explore ZoomURL'] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["cabinLink"] = record['fields']['Cabin ZoomURL'] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["createLink"] = record['fields']['Create ZoomURL'] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["gatherLink"] = record['fields']['Gather ZoomURL'] if ('Gather ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                else:
+                    user_data["exploreLink"] = record['fields']['Explore ZoomURL'][0] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["cabinLink"] = record['fields']['Cabin ZoomURL'][0] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["createLink"] = record['fields']['Create ZoomURL'][0] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["gatherLink"] = record['fields']['Gather ZoomURL'][0] if ('Gather ZoomURL' in record['fields']) else 'Visit HelpDesk'
                 user_data["family"] = record['fields']['Family'] if ('Family' in record['fields']) else 'Visit HelpDesk'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
@@ -330,7 +345,6 @@ def schedules():
         for record in schInfo:
             
             if record['fields']['Block'] == 'TRANSITION':
-                print('hit')
                 transition_time = record['fields']['Duration']/60
                 transition_flag = 1
                 continue
@@ -356,7 +370,6 @@ def schedules():
                 #     durTracker = startdate + timedelta(days=(int(day)-1), minutes=user_data["offset"])
 
             schData[1] = durTracker + timedelta(minutes=transition_time)
-            print(schData[1], transition_time, transition_flag)
             durTracker = durTracker + timedelta(minutes=duration) + timedelta(minutes=transition_time)
             schData[0] = datetime.strftime(schData[1], "%b %-d")
             schData[1] = datetime.strftime(schData[1], "%I:%M %p") 
@@ -373,6 +386,8 @@ def schedules():
                 schData[3] = htmlanchor(user_data["exploreLink"])
             elif type == 'Create ZoomURL':
                 schData[3] = htmlanchor(user_data["createLink"])
+            elif type == 'Gather ZoomURL':
+                schData[3] = htmlanchor(user_data["gatherLink"])
             elif type == 'PT1':
                 schData[3] = htmlanchor(PT1_LINK)
             elif type == 'PT2':
@@ -392,10 +407,10 @@ def schedules():
             schArr.append(schData)
 
         #get camp day #, default to 1
-        campday = (datetime.utcnow().day % startdate.day) if 0<(datetime.utcnow().day % startdate.day)<7 else 1
+        campday = (datetime.utcnow().day % startdate.day) + 1 if 0<(datetime.utcnow().day % startdate.day)<7 else 1
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
-        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region)
+        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, l1 = os.getenv('L1_LINK'), l2 = os.getenv('L2_LINK'), l3 = os.getenv('L3_LINK'))
     
     return redirect(url_for("login"))
 
