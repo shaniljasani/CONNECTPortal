@@ -298,10 +298,12 @@ def schedules():
                     user_data["exploreLink"] = record['fields']['Explore ZoomURL'] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
                     user_data["cabinLink"] = record['fields']['Cabin ZoomURL'] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
                     user_data["createLink"] = record['fields']['Create ZoomURL'] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["gatherLink"] = record['fields']['Gather ZoomURL'] if ('Gather ZoomURL' in record['fields']) else 'Visit HelpDesk'
                 else:
                     user_data["exploreLink"] = record['fields']['Explore ZoomURL'][0] if ('Explore ZoomURL' in record['fields']) else 'Visit HelpDesk'
                     user_data["cabinLink"] = record['fields']['Cabin ZoomURL'][0] if ('Cabin ZoomURL' in record['fields']) else 'Visit HelpDesk'
                     user_data["createLink"] = record['fields']['Create ZoomURL'][0] if ('Create ZoomURL' in record['fields']) else 'Visit HelpDesk'
+                    user_data["gatherLink"] = record['fields']['Gather ZoomURL'][0] if ('Gather ZoomURL' in record['fields']) else 'Visit HelpDesk'
                 user_data["family"] = record['fields']['Family'] if ('Family' in record['fields']) else 'Visit HelpDesk'
                 user_data["timezone"] = session.get("timezone", None) if session.get("timezone", None) else 'UTC'
                 user_data["offset"] = -1 * session.get("offset", None) if session.get("offset", None) else 0 #momentjs returns the inverse value
@@ -384,6 +386,8 @@ def schedules():
                 schData[3] = htmlanchor(user_data["exploreLink"])
             elif type == 'Create ZoomURL':
                 schData[3] = htmlanchor(user_data["createLink"])
+            elif type == 'Gather ZoomURL':
+                schData[3] = htmlanchor(user_data["gatherLink"])
             elif type == 'PT1':
                 schData[3] = htmlanchor(PT1_LINK)
             elif type == 'PT2':
