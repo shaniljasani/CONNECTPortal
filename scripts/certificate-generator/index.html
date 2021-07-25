@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CONNECT Certificate Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+  </style>
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<h3><i>This is an INTERNAL Tool, please do not share.</i></h3>
+<hr/>
+<h1>CONNECT Certificate Generator</h1>
+<p>This is a tool using <a href="https://parall.ax/products/jspdf">jsPDF</a> to make CONNECT Certificates</p>
+
+<!-- <h2>option 1</h2>
+<p>Enter a participant's information (this can be automated from portal)</p>
+
+  <p>Please select your family</p>
+  <input type="radio" id="ET1" name="family" value="ET1"><label for="ET1"> ET1</label><br>
+  <input type="radio" id="ET2" name="family" value="ET2"><label for="ET2"> ET2</label><br>
+  <input type="radio" id="ET3" name="family" value="ET3"><label for="ET3"> ET3</label><br>
+  <input type="radio" id="ET4" name="family" value="ET4"><label for="ET4"> ET4</label><br>
+  <input type="radio" id="ET5" name="family" value="ET5"><label for="ET5"> ET5</label><br>
+  <input type="radio" id="HW1" name="family" value="HW1"><label for="HW1"> HW1</label><br>
+  <input type="radio" id="HW2" name="family" value="HW2"><label for="HW2"> HW2</label><br>
+  <input type="radio" id="HW3" name="family" value="HW3"><label for="HW3"> HW3</label><br>
+  <input type="radio" id="HW4" name="family" value="HW4"><label for="HW4"> HW4</label><br>
+  <input type="radio" id="AC1" name="family" value="AC1"><label for="AC1"> AC1</label><br>
+  <input type="radio" id="AC2" name="family" value="AC2"><label for="AC2"> AC2</label><br>
+  <input type="radio" id="AC3" name="family" value="AC3"><label for="AC3"> AC3</label><br>
+  <input type="radio" id="AC4" name="family" value="AC4"><label for="AC4"> AC4</label><br>
+  <input type="radio" id="AC5" name="family" value="AC5"><label for="AC5"> AC5</label><br>
+  <input type="radio" id="CE1" name="family" value="CE1"><label for="CE1"> CE1</label><br>
+  <input type="radio" id="CE2" name="family" value="CE2"><label for="CE2"> CE2</label><br>
+  <input type="radio" id="CE3" name="family" value="CE3"><label for="CE3"> CE3</label><br>
+  <input type="radio" id="PT1" name="family" value="PT1"><label for="PT1"> PT1</label><br>
+  <input type="radio" id="PT2" name="family" value="PT2"><label for="PT2"> PT2</label><br>
+<br/>
+<input type="text" placeholder="name" id="txtContent"/>
+<input type="number"placeholder="id" id="id"/>
+<textarea id="txtContent" cols="60" rows="15"></textarea> -->
+<!-- <button id="btnDownload"> Generate PDF </button> -->
+
+<!-- <h2>option 2</h2> -->
+
+
+<p>Upload a csv. Format is:
+<code>ID, Name, Country, Family, CREATE Name</code></p> <br/>
+
+<textarea id="csvContent" cols="60" rows="15"></textarea>
+<br/>
+<button id="btn2Download"> Generate PDFs </button>
+
+<h2>Done List is below</h2>
+<p id="doneList"></p>
+
+
+
+<hr/>
+<p id="resulting">If all goes well, access your certificate(s) at: <a target="blank" href="https://campconnect.co/certificate-generator/files/S21/">https://campconnect.co/certificate-generator/files/S21/</a></p>
+  <script src='./jspdf.js'></script>
+  <!-- <script src="./script.js"></script> -->
+  <script src="./familyScript.js"></script>
+  
+
+</body>
+</html>
