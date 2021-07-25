@@ -242,27 +242,29 @@ def logout():
 
     return(redirect(url_for("login")))
 
-# @app.route('/certificate')
-# def certificate():
-#     user_id = session.get("user", None)
-#     timestamp = datetime.now(tz=utc)
+@app.route('/certificate')
+def certificate():
+    user_id = session.get("user", None)
+    timestamp = datetime.now(tz=utc)
 
-#     if user_id:
-#         user_info = None
-#         name = None
+    if user_id:
+        user_info = None
+        name = None
 
-#         if user_id < 1010:
-#             user_info = Airtable(BASE_ID, 'Facilitator', API_KEY).search("ID", user_id)[0]["fields"]
-#             name = user_info["Full Name"][0]
-#         else:
-#             user_info = Airtable(BASE_ID, 'Participant', API_KEY).search("ID", user_id)[0]["fields"]
-#             name = user_info["Participant Name"][0]
+        # if user_id < 1010:
+        #     user_info = Airtable(BASE_ID, 'Facilitator', API_KEY).search("ID", user_id)[0]["fields"]
+        #     name = user_info["Full Name"][0]
+        # else:
+        #     user_info = Airtable(BASE_ID, 'Participant', API_KEY).search("ID", user_id)[0]["fields"]
+        #     name = user_info["Participant Name"][0]
 
-#         #log_user_activity(user_id, "/certificate", timestamp)
+        #log_user_activity(user_id, "/certificate", timestamp)
 
-#         return render_template("certificate.html", name=name)
+        # return render_template("certificate.html", name=name)
+        return render_template("certificate.html")
 
-#     return redirect(url_for("login"))
+
+    return redirect(url_for("login"))
 
 
 #function to create html anchors
