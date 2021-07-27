@@ -261,8 +261,13 @@ def certificate():
         #log_user_activity(user_id, "/certificate", timestamp)
 
         # return render_template("certificate.html", name=name)
-        return render_template("certificate.html")
 
+        # 2021 - check if file exists
+        path = "https://campconnect.co/certificates/2021-Summer/S21-Certificate-" + str(user_id) + ".pdf"
+        r = requests.get(path, headers={"User-Agent": "XY"})
+        if (r.status_code == 406 or r.status_code == 200):
+            return render_template("certificate.html", certificate=path)
+        return render_template("certificate.html", certificate=None)
 
     return redirect(url_for("login"))
 
