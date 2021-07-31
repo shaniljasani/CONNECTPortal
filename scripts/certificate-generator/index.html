@@ -22,6 +22,12 @@
 <h1>CONNECT Certificate Generator</h1>
 <p>This is a tool using <a href="https://parall.ax/products/jspdf">jsPDF</a> to make CONNECT Certificates</p>
 
+  <p>Please select where these files will be going:</p>
+  <input type="radio" id="participant" name="user_type" value="participant" checked>
+  <label for="participant">participant</label><br>
+  <input type="radio" id="facilitator" name="user_type" value="facilitator">
+  <label for="facilitator">facilitator</label><br>
+
 <!-- <h2>option 1</h2>
 <p>Enter a participant's information (this can be automated from portal)</p>
 
@@ -60,6 +66,8 @@
 <textarea id="csvContent" cols="60" rows="15"></textarea>
 <br/>
 <button id="btn2Download"> Generate PDFs </button>
+
+<h2>Status: <span id="doneStatus">Not Done</span></h2>
 
 <h2>Done List is below</h2>
 <p id="doneList"></p>
