@@ -8,7 +8,7 @@ import git
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect, session
 from airtable import Airtable
-from datetime import datetime, timedelta, tzinfo
+from datetime import date, datetime, timedelta, tzinfo
 
 utc = pytz.utc
 load_dotenv(dotenv_path="./config.py")
@@ -277,7 +277,7 @@ def htmlanchor(link):
 def schedules():
     user_id = session.get("user", None)
     theme = session.get("theme", None)
-    timestamp = datetime.now(tz=utc)
+    #timestamp = datetime.now(tz=utc)
 
     # ZOOM_DOMAIN = os.getenv("ZOOM_DOMAIN")
     
@@ -408,7 +408,9 @@ def schedules():
             schArr.append(schData)
 
         #get camp day #, default to 1
-        campday = (datetime.utcnow().day % startdate.day) + 1 if 0<(datetime.utcnow().day % startdate.day)<7 else 1
+        datediff = datetime.utcnow()-startdate
+        campday = datediff.days + 1 if datediff.days > 0 and datediff.days < 7 else 1
+
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
         return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, l1 = os.getenv('L1_LINK'), l2 = os.getenv('L2_LINK'), l3 = os.getenv('L3_LINK'))
