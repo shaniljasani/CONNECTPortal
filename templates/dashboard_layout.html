@@ -120,28 +120,33 @@
         {% endif %} -->
 
 
+    {% if (session.get("theme", None) == "PT1 ET" or 
+      session.get("theme", None) == "PT2 HW") or 
+      session.get("theme", None) == "ET" or 
+      session.get("theme", None) == "HW" %}
     <!-- Last Day Celebration -->
         <!-- Divider -->
-        <!-- <hr class="sidebar-divider"> -->
+        <hr class="sidebar-divider">
 
         <!-- Heading -->
-        <!-- <div class="sidebar-heading">
+        <div class="sidebar-heading">
           Celebration
-        </div> -->
+        </div>
         
         <!-- Nav Item - Certificate -->
-        <!-- <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link" href="/certificate">
             <i class="fas fa-fw fa-certificate"></i>
             <span>Certificate</span></a>
-        </li> -->
+        </li>
 
         <!-- Nav Item - Game -->
-        <!-- <li class="nav-item">
-          <a class="nav-link" href="https://fun.campconnect.co">
+        <li class="nav-item">
+          <a class="nav-link" href="https://campconnect.co/fun">
             <i class="fas fa-fw fa-gamepad"></i>
             <span>CONNECT Game</span></a>
-        </li> -->
+        </li>
+      {% endif %}
 
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
