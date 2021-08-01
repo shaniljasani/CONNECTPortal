@@ -384,33 +384,34 @@ def schedules():
 
             #Activity
             type = record['fields']['Zoom URL Portal Sync'] if 'Zoom URL Portal Sync' in record['fields'] else 'error'
-            schData[2] = record['fields']['Module Title'] if 'Module Title' in record['fields'] else type
+            schData[2] = record['fields']['Block'] if 'Block' in record['fields'] else type
+            schData[3] = record['fields']['Module Title'] if 'Module Title' in record['fields'] else type
 
             #Zoom Link
             if type == 'Cabin ZoomURL':
-                schData[3] = htmlanchor(user_data["cabinLink"])
+                schData[4] = htmlanchor(user_data["cabinLink"])
             elif type == 'Explore ZoomURL':
-                schData[3] = htmlanchor(user_data["exploreLink"])
+                schData[4] = htmlanchor(user_data["exploreLink"])
             elif type == 'Create ZoomURL':
-                schData[3] = htmlanchor(user_data["createLink"])
+                schData[4] = htmlanchor(user_data["createLink"])
             elif type == 'Gather ZoomURL':
-                schData[3] = htmlanchor(user_data["gatherLink"])
+                schData[4] = htmlanchor(user_data["gatherLink"])
             elif type == 'PT1':
-                schData[3] = htmlanchor(PT1_LINK)
+                schData[4] = htmlanchor(PT1_LINK)
             elif type == 'PT2':
-                schData[3] = htmlanchor(PT2_LINK)
+                schData[4] = htmlanchor(PT2_LINK)
             elif type == 'Lounge':
-                schData[3] = htmlanchor('lounge')
+                schData[4] = htmlanchor('lounge')
             # elif type == 'FCD / PD Line':
-            #     schData[3] = htmlanchor(ZOOM_DOMAIN + user_data["family"][0].lower() + 'fcd')
+            #     schData[4] = htmlanchor(ZOOM_DOMAIN + user_data["family"][0].lower() + 'fcd')
             elif type == 'External':
-                schData[3] = htmlanchor(record['fields']['ExternalLink']) if 'ExternalLink' in record['fields'] else htmlanchor('Visit HelpDesk')
+                schData[4] = htmlanchor(record['fields']['ExternalLink']) if 'ExternalLink' in record['fields'] else htmlanchor('Visit HelpDesk')
             elif record['fields']['Block'] == 'TRANSITION':
-                schData[3] = 'Go To Next Line'
+                schData[4] = 'Go To Next Line'
             else:
-                schData[3] = schData[2]
+                schData[4] = schData[3]
             
-            schData[4] = record['fields']['Day']
+            schData[5] = record['fields']['Day']
             schArr.append(schData)
 
         #get camp day #, default to 1

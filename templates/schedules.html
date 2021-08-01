@@ -99,6 +99,7 @@ View your personalized CONNECT Schedule.
             <tr>
               <th>Day</th>
               <th>Time</th>
+              <th>Block</th>
               <th>Activity</th>
               <th>Link</th>
             </tr>
@@ -274,7 +275,7 @@ View your personalized CONNECT Schedule.
                   "paging": false,
                   "columnDefs": [
                         {
-                            "targets": [4],
+                            "targets": [5],
                             "visible": false,
                         },
                     ],
@@ -308,7 +309,7 @@ View your personalized CONNECT Schedule.
     
     $.fn.dataTable.ext.search.push(
       function( settings, data, dataIndex ) {
-        if (data[4] == val)
+        if (data[5] == val)
         {
             return true;
         }
