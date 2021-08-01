@@ -9,6 +9,10 @@
 
 <!-- Last Day Celebration - Certificate Box -->
 <!-- announcement box -->
+{% if (session.get("theme", None) == "PT1 ET" or 
+      session.get("theme", None) == "PT2 HW") or 
+      session.get("theme", None) == "ET" or 
+      session.get("theme", None) == "HW" %}
 <div class="row">
   <div class="col-lg-6 mb-4">
     <div class="card bg-info text-white shadow">
@@ -19,6 +23,8 @@
     </div>
   </div>
 </div>
+
+{% endif %}
 
 <!-- Page Heading -->
 <!-- <div class="d-sm-flex align-items-center justify-content-between mb-4"> -->
