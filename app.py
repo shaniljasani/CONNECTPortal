@@ -265,6 +265,8 @@ def certificate():
         # 2021 - check if file exists
         path = "https://campconnect.co/certificates/2021-Summer/S21-Certificate-" + str(user_id) + ".pdf"
         r = requests.get(path, headers={"User-Agent": "XY"})
+        if (session.get('theme', None) == "AC" or session.get('theme', None) == "CE"):
+            return render_template("certificate.html", certificate=None)
         if (r.status_code == 406 or r.status_code == 200):
             return render_template("certificate.html", certificate=path)
         return render_template("certificate.html", certificate=None)
