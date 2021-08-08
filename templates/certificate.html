@@ -11,21 +11,32 @@
     <h1 class="h3 mb-2 text-gray-800">CONNECT Certificates</h1>
     <p class="mb-4">You did it! Mark your completion of CONNECT with this certificate.</p>
 
+    {% if session.get("theme", None) == "ET" %}
     <a href="https://l.campconnect.co/postcampsurveyet" class="btn text-white btn-primary shadow mb-2"><i
         class="fas fa-poll-h text-white-50"></i> E&T - Complete your participant survey here</a>
     <br/>
+    {% endif %}
+    {% if session.get("theme", None) == "PT1 ET" or session.get('theme', None) == "PT2 HW" %}
     <a href="https://l.campconnect.co/postcampsurveypt" class="btn text-white btn-primary shadow mb-2"><i
         class="fas fa-poll-h text-white-50"></i> Pajvast - Complete your participant survey here</a>
     <br/>
+    {% endif %}
+    {% if session.get("theme", None) == "HW" %}
     <a href="https://l.campconnect.co/postcampsurveyhw" class="btn text-white btn-primary shadow mb-2"><i
         class="fas fa-poll-h text-white-50"></i> H&W - Complete your participant survey here</a>
     <br/>
+    {% endif %}
+    {% if session.get("theme", None) == "CE" %}
     <a href="https://l.campconnect.co/ceparticipantevaluation" class="btn text-white btn-primary shadow mb-2"><i
         class="fas fa-poll-h text-white-50"></i> CE - Complete your participant survey here</a>
     <br/>
+    {% endif %}
+    {% if session.get("theme", None) == "AC" %}
     <a href="https://l.campconnect.co/acparticipantevaluation" class="btn text-white btn-primary shadow mb-2"><i
         class="fas fa-poll-h text-white-50"></i> AC - Complete your participant survey here</a>
     <br/>
+    {% endif %}
+    
 
 
     {% if certificate == None %}
