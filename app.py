@@ -34,7 +34,7 @@ def clear_trailing():
 
 def verify(user, pw):
     user_tbl = 'Facilitators & Staff'
-    if(int(user)>3999 and int(user)<9000):
+    if(int(user)<10001):
         user_tbl = 'Participants'
     airtable = Airtable(BASE_ID, user_tbl, API_KEY)
     user_data = airtable.search("ID", user)
@@ -48,10 +48,10 @@ def verify(user, pw):
 
 def get_camp(uid):
     user_tbl = 'Facilitators & Staff'
-    if(int(uid)>3999 and int(uid)<9000):
+    if(int(uid)<10001):
         user_tbl = 'Participants'
-    user_data = Airtable(BASE_ID, user_tbl, API_KEY).get_all(fields=['Theme'], formula=f"{{ID}}={uid}")
-    session["theme"] = user_data[0]["fields"]["Theme"]
+    user_data = Airtable(BASE_ID, user_tbl, API_KEY).get_all(fields=['Theme', 'Camp Session'], formula=f"{{ID}}={uid}")
+    session["theme"] = user_data[0]["fields"]["Theme"] + user_data[0]["fields"]["Camp Session"]
     if 'PT1' in user_data[0]["fields"]["Theme"]:
         session["theme"] = 'PT1 ET'
     if 'PT2' in user_data[0]["fields"]["Theme"]:
@@ -295,7 +295,7 @@ def schedules():
         #log_user_activity(user_id, "/schedules", timestamp)
         
         user_tbl = 'Facilitators & Staff'
-        if(user_id>3999 and user_id<9000):
+        if(user_id<10001):
             user_tbl = 'Participants'
 
         user_data = {}
@@ -327,7 +327,7 @@ def schedules():
             #startdate = startdate + timedelta(hours=-1)
 
         #get sch view
-        schedule_tbl = 'Schedule: ' + theme
+        schedule_tbl = theme + ' - Schedule'
         #schedule_tbl = os.getenv("SCHEDULE_TABLE") if os.getenv("SCHEDULE_TABLE") else 'Schedule'
         #schInfo = Airtable(BASE_ID, schedule_tbl, API_KEY).get_all(formula=formula,sort=['Day', 'Order'])
         #schInfo = Airtable(BASE_ID, schedule_tbl, API_KEY).get_all(view=f'Build: {theme}')
