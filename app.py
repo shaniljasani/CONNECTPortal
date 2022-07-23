@@ -275,7 +275,7 @@ def certificate():
 #function to create html anchors
 def htmlanchor(link):
     if link=='Visit HelpDesk':
-        return "<a href='https://link.campconnect.co/helpdesk' target='_blank'>" + link + "</a>"
+        return "<a href='https://campconnect-co-2022.zoom.us/my/helpdeskconnect' target='_blank'>" + link + "</a>"
     elif link=='lounge':
         return '<a href="#lounge">Lounge Links</a>'
     return "<a href='" + link + "' target='_blank'>" + link + "</a>"
@@ -420,7 +420,7 @@ def schedules():
 
         region = session.get("tz_region", None) if session.get("tz_region", None) else "Etc/UTC"
 
-        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, l1 = os.getenv('L1_LINK'), l2 = os.getenv('L2_LINK'), l3 = os.getenv('L3_LINK'))
+        return render_template('schedules.html', data=schArr, campday=campday, tz=user_data["timezone"], tz_region=region, l1 = "https://campconnect-co-2022.zoom.us/my/connectlounge1", l2 = os.getenv('L2_LINK'), l3 = os.getenv('L3_LINK'))
     
     return redirect(url_for("login"))
 
